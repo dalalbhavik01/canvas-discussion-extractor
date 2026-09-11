@@ -2,13 +2,13 @@
 
 ## Codex
 
-Copy this complete `discussion` folder into the target account's `$CODEX_HOME/skills` (normally `~/.codex/skills`). Keep `SKILL.md`, `agents`, `references`, and `scripts` together. Open a new task so the app can discover the skill and use `$discussion <URLs>`. The backslash phrase `\discussion` is a conversational alias, not a command registered with Codex.
+Copy this complete `discussion` folder into the target account's `$CODEX_HOME/skills` (normally `~/.codex/skills`). Keep `SKILL.md`, `agents`, `references`, and `scripts` together. Once the skill appears in the available skills list, use `\discussion <URLs>`. Open a new task if the current one has not refreshed its skills. `$discussion <URLs>` is also supported. The primary backslash trigger follows the old repo's conversational convention; it is not a command registered with Codex.
 
 No personal paths, Canvas URLs, authentication details, course IDs, or student records are built into the skill. Each run needs fresh discussion URLs and the user's logged-in browser. Installing the skill does not give another account your Canvas session.
 
 ## Another Agent
 
-Provide `SKILL.md` and the referenced files to the agent. Ask it to follow the workflow with its documented browser and file tools. Browser application-state access is optional and must be allowed by that host; never transfer an assumption that hidden-cache evaluation is supported. If only screenshots are available, the agent must establish identity and completeness or request a user export, not fabricate structured records.
+Provide [portable-workflow.md](portable-workflow.md) as the operating prompt, or provide `SKILL.md` and its references together. The standalone prompt works without paths outside this folder. Ask the agent to follow the workflow with its documented browser and file tools. Browser application-state access is optional and must be allowed by that host; never transfer an assumption that hidden-cache evaluation is supported. If only screenshots are available, the agent must establish identity and completeness or request a user export, not fabricate structured records.
 
 ## Local Export Commands
 

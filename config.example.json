@@ -1,0 +1,16 @@
+{
+  "primary_trigger": "\\discussion",
+  "native_codex_skill": "$discussion",
+  "default_output_root": "outputs",
+  "canvas_policy": "read_only",
+  "coequal_policy": "local_files_only",
+  "thread_expansion": "agent_may_expand_unless_user_says_stop",
+  "reply_columns": "all_peer_replies",
+  "non_peer_content": "retain_in_audit_and_capture",
+  "cohort_output": "separate_workbooks",
+  "student_order": "captured_unless_verified_gradebook_order_requested",
+  "source_method": "permitted_by_current_browser_tool",
+  "require_source_coverage": true,
+  "require_saved_cell_verification": true,
+  "dependency_installs": "isolated_environment_only"
+}

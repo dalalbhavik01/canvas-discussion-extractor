@@ -5,6 +5,18 @@ description: Extract Canvas discussion posts and all replies into section-specif
 
 # Canvas Discussion Extractor
 
+## Primary Trigger
+
+When the user writes:
+
+```text
+\discussion <Canvas discussion URL> [second cohort URL]
+```
+
+run this workflow for those links. This is the primary conversational trigger, following the same convention as `\createAssignment` in the assignment-creator skill. `$discussion` remains the native Codex skill invocation. A backslash command does not require a separate application command registration.
+
+If the user supplies just `\discussion`, use discussion links explicitly provided for the current request; ask for links only if the intended discussion cannot be determined. Never substitute old course links from prior assignments.
+
 Produce one workbook per requested cohort, with `Posts and Replies` first. Use `Student Name`, `Discussion Post`, `Reply 1`, `Reply 2`, extending with `Reply 3`, etc. Retain every reply. Attribute content to its writer using verified author IDs, never by thread owner or name alone.
 
 ## Boundaries
@@ -17,7 +29,9 @@ Produce one workbook per requested cohort, with `Posts and Replies` first. Use `
 
 ## Workflow
 
-Read [workflow.md](references/workflow.md) before extracting. Read [data-contract.md](references/data-contract.md) when capturing or running the exporter. For installation or another agent, read [transfer.md](references/transfer.md).
+Before extracting, read [Workflow](references/workflow.md), [Canvas Read-Only Policy](references/canvas-read-only-policy.md), and [Error Handling](references/error-handling.md). Use [Verification Checklist](references/verification-checklist.md) at checkpoints and final handoff. Read [Data Contract](references/data-contract.md) when capturing or running the exporter. For installation or another agent, read [Transfer](references/transfer.md) and the self-contained [Portable Workflow](references/portable-workflow.md).
+
+Maintain the agent-owned [Run State](references/run-state-template.json) from preflight onwards. Record stages, evidence references, decisions, and unresolved issues as they occur. This is separate from the scripts' exported `prepared.json` and `report.json`; the scripts do not track browser actions. On failures consult the [Error Matrix](references/comprehensive-error-handling-matrix.md). For tests or an independent review, use [Failure Drills](references/failure-drills.md).
 
 1. Identify each current discussion's course, section, title, URL, pagination, filters, and capture time. Never reuse earlier assignment IDs, roster mappings, or grading rules.
 2. Verify thread expansion. Expand using a fresh semantic locator if authorized. If the user says to stop on collapsed threads, stop and ask them to expand instead. Their current instruction overrides this default.

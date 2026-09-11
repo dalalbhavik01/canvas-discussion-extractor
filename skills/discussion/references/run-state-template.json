@@ -1,0 +1,39 @@
+{
+  "template_version": 1,
+  "managed_by": "host_agent",
+  "run_id": null,
+  "primary_trigger": "\\discussion",
+  "started_at": null,
+  "updated_at": null,
+  "stage": "preflight",
+  "status": "in_progress",
+  "current_instructions": [],
+  "sources": [],
+  "sections": [],
+  "artifacts": {
+    "raw_captures": [],
+    "normalized_capture": null,
+    "prepared_matrices": null,
+    "export_report": null,
+    "workbooks": [],
+    "readback_report": null
+  },
+  "qa": {
+    "source_scope": "unresolved",
+    "page_coverage": "unresolved",
+    "thread_reconciliation": "unresolved",
+    "author_mapping": "unresolved",
+    "saved_cell_preservation": "unresolved",
+    "visual_review": "unresolved",
+    "source_spot_checks": "unresolved"
+  },
+  "canvas_integrity": {
+    "course_content_edits": "not_assessed",
+    "read_state_observations": [],
+    "uncertain_actions": []
+  },
+  "action_log": [],
+  "decision_log": [],
+  "unresolved_issues": [],
+  "next_action": null
+}

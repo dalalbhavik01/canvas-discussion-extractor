@@ -7,10 +7,10 @@ A portable agent skill for extracting Canvas discussion posts and **all** replie
 Install `skills/discussion` in your agent's skills folder, then invoke:
 
 ```text
-$discussion <discussion URL for cohort 1> <discussion URL for cohort 2>
+\discussion <discussion URL for cohort 1> <discussion URL for cohort 2>
 ```
 
-`\discussion <URLs>` is also a phrase recognized by these instructions; it is not a registered application command. The native Codex skill invocation is `$discussion`.
+`\discussion` is the primary conversational trigger, just as `\createAssignment` is in the old repo. `$discussion <URLs>` also works as the native Codex skill invocation. No custom backslash command is registered with the application.
 
 The agent uses an authenticated browser supplied by the user. This is an agent-assisted extraction workflow, not a standalone crawler. It requires no Canvas API token or OAuth integration. Browser access and permitted inspection capabilities depend on the host. No credentials or student records ship with the skill.
 
@@ -22,7 +22,66 @@ The workflow reconciles thread counts, validates parent relationships, preserves
 
 ## Transfer and Development
 
-See [transfer instructions](skills/discussion/references/transfer.md) for installation, dependencies, generic-agent use, and packaging. The entire skill is self-contained under `skills/discussion`.
+See [transfer instructions](skills/discussion/references/transfer.md) for installation, dependencies, generic-agent use, and packaging. The entire skill is self-contained under `skills/discussion`. For a host without skill installation, provide the [portable prompt](skills/discussion/references/portable-workflow.md). Optional run defaults are in [config.example.json](config.example.json); the agent interprets them, and scripts continue to accept explicit capture/output paths.
+
+## Workflow and Recovery
+
+```mermaid
+flowchart TD
+    A[User sends discussion links] --> B[Preflight and run checkpoint]
+    B --> C{Canvas action is read-only?}
+    C -->|Yes| D[Expand and capture every page and reply]
+    C -->|No or uncertain| X[Stop the action and report]
+    D --> E[Reconcile roots, replies, and student IDs]
+    E --> F{Source coverage verified?}
+    F -->|No| R[Classify issue and use a safe recovery]
+    R --> D
+    F -->|Yes| G[Create one Excel file per cohort]
+    G --> H[Read saved cells and compare with capture]
+    H --> I[Source spot-checks and visual review]
+    I --> J[Deliver files and verification summary]
+```
+
+| Level | Meaning | Response |
+| --- | --- | --- |
+| L0 | Expected, verified operation | Continue and checkpoint. |
+| L1 | Safe recovery preserving source content | Retry once or use a permitted fallback; record it. |
+| L2 | Missing input or unresolved source decision | Pause affected work and ask a specific question. |
+| L3 | Suspected mutation or unsafe action | Stop the action immediately and disclose evidence. |
+
+The host agent owns recovery decisions. See [architecture](docs/agentic-architecture.md), [error handling](skills/discussion/references/error-handling.md), [failure matrix](skills/discussion/references/comprehensive-error-handling-matrix.md), and [verification checklist](skills/discussion/references/verification-checklist.md). Routine read-only actions need no repeated approval. Live-source failures cannot be made to pass by changing expected counts.
+
+## Repository Structure
+
+```text
+README.md
+config.example.json
+docs/
+  agentic-architecture.md
+  old-repo-comparison.md
+skills/discussion/
+  SKILL.md
+  agents/openai.yaml
+  references/
+    workflow.md
+    canvas-read-only-policy.md
+    error-handling.md
+    comprehensive-error-handling-matrix.md
+    verification-checklist.md
+    run-state-template.json
+    failure-drills.md
+    portable-workflow.md
+    transfer.md
+    data-contract.md
+  scripts/
+    prepare.mjs
+    build_workbooks.mjs
+    restore_text_cells.py
+    verify_workbooks.py
+tests/
+```
+
+This follows the old repo's playbook/skill/recovery structure, adapted for discussion extraction. The [comparison](docs/old-repo-comparison.md) records what was carried over and what belongs only to assignment creation. Operational references live inside the skill so copying that folder also transfers its safety and recovery instructions.
 
 Run the dependency-free checks with Node.js 20 or newer:
 
