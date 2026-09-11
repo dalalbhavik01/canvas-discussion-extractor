@@ -1,0 +1,15 @@
+outputs/
+captures/
+private/
+node_modules
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.env.*
+*.xlsx
+*.csv
+*.zip
+config.local.json
+run.local.json

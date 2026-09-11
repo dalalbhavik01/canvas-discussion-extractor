@@ -1,0 +1,4 @@
+interface:
+  display_name: "Canvas Discussion Extractor"
+  short_description: "Export Canvas posts and every reply by cohort"
+  default_prompt: "Use $discussion to extract these Canvas discussions into separate cohort workbooks, preserving all replies and keeping Canvas read-only."
