@@ -1,6 +1,8 @@
 # Canvas Discussion Extractor
 
-A portable agent skill for extracting Canvas discussion posts and **all** replies into section-specific CoEqual workbooks. Inspired by the workflow structure of [coequal-assignment-creator](https://github.com/dalalbhavik01/coequal-assignment-creator).
+A portable agentic workflow and installable skill for extracting Canvas discussion posts and **all** replies into section-specific CoEqual workbooks. Inspired by the workflow structure of [coequal-assignment-creator](https://github.com/dalalbhavik01/coequal-assignment-creator).
+
+The host AI agent plans and operates the browser, maintains checkpoints, handles unexpected cases, and verifies source coverage. Deterministic helpers validate captures and preserve Excel content. This is an operating playbook with supporting tools, not an unattended crawler or a separate model service.
 
 ## Use
 
@@ -24,7 +26,16 @@ The workflow reconciles thread counts, validates parent relationships, preserves
 
 ## Transfer and Development
 
-See [transfer instructions](skills/discussion/references/transfer.md) for installation, dependencies, generic-agent use, and packaging. The entire skill is self-contained under `skills/discussion`. For a host without skill installation, provide the [portable prompt](skills/discussion/references/portable-workflow.md). Optional run defaults are in [config.example.json](config.example.json); the agent interprets them, and scripts continue to accept explicit capture/output paths.
+The repository is [canvas-discussion-extractor](https://github.com/dalalbhavik01/canvas-discussion-extractor). To install through a skill-capable agent, ask:
+
+```text
+Install the discussion skill from
+https://github.com/dalalbhavik01/canvas-discussion-extractor/tree/main/skills/discussion
+```
+
+Alternatively, clone the repository and install the complete `skills/discussion` folder using your host's skill installation mechanism. No ZIP is needed. Do not replace a customized existing skill without checking its changes.
+
+See [transfer instructions](skills/discussion/references/transfer.md) for installation, dependencies, and generic-agent use. The entire skill is self-contained under `skills/discussion`. For a host without skill installation, provide the [portable prompt](skills/discussion/references/portable-workflow.md). Optional run defaults are in [config.example.json](config.example.json); the agent interprets them, and scripts continue to accept explicit capture/output paths.
 
 ## Workflow and Recovery
 
@@ -70,6 +81,7 @@ skills/discussion/
     workflow.md
     canvas-read-only-policy.md
     error-handling.md
+    model-escalation.md
     comprehensive-error-handling-matrix.md
     verification-checklist.md
     run-state-template.json

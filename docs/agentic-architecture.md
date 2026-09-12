@@ -16,4 +16,4 @@ These are responsibilities, not claims that separate subagents or an unattended 
 
 The [run-state template](../skills/discussion/references/run-state-template.json) is agent-maintained, whereas the scripts emit deterministic capture/export artifacts. Recovery reads saved evidence and rechecks source stability; it never treats previous conversation memory as source data. The [error rules](../skills/discussion/references/error-handling.md) define L0-L3 decisions and interruption handling.
 
-All operational references reside inside `skills/discussion` so the installed skill and transfer ZIP contain the full workflow. README/config/docs support repository use without becoming external dependencies of the installed skill.
+All operational references reside inside `skills/discussion` so the installed skill and a repository clone contain the full workflow. README/config/docs support repository use without becoming external dependencies of the installed skill.
