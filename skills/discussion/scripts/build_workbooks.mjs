@@ -4,11 +4,13 @@ import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { prepareCapture, columnName } from './prepare.mjs';
+import { prepareCapture, selectCapture, parseSectionArgs, columnName } from './prepare.mjs';
 
-export async function build(inputPath, outputDir, { render = true } = {}) {
+export async function build(inputPath, outputDir, { render = true, selectedKeys } = {}) {
   const original = await fs.readFile(inputPath, 'utf8');
-  const prepared = prepareCapture(JSON.parse(original));
+  const input = JSON.parse(original);
+  const prepared = prepareCapture(input, { selectedKeys });
+  const { capture } = selectCapture(input, selectedKeys);
   const resolveFromHost = createRequire(path.join(process.cwd(), 'runtime-resolver.cjs'));
   let libraryPath;
   try { libraryPath = resolveFromHost.resolve('@oai/artifact-tool'); }
@@ -16,7 +18,7 @@ export async function build(inputPath, outputDir, { render = true } = {}) {
   const { Workbook, SpreadsheetFile } = await import(pathToFileURL(libraryPath).href);
   // A new directory prevents failed reruns from masquerading as an earlier verified export.
   await fs.mkdir(outputDir, { recursive: false });
-  await fs.writeFile(path.join(outputDir, 'capture.json'), original, { flag: 'wx' });
+  await fs.writeFile(path.join(outputDir, 'capture.json'), JSON.stringify(capture, null, 2), { flag: 'wx' });
   await fs.writeFile(path.join(outputDir, 'prepared.json'), JSON.stringify(prepared, null, 2), { flag: 'wx' });
   const files = [];
   for (const section of prepared.sections) {
@@ -63,6 +65,7 @@ export async function build(inputPath, outputDir, { render = true } = {}) {
   ], { stdio: 'pipe' });
   await fs.writeFile(path.join(outputDir, 'report.json'), JSON.stringify({
     capture_sha256: prepared.capture_sha256,
+    scope: prepared.scope,
     status: 'exported-awaiting-independent-readback',
     note: 'Source evidence is supplied by the capturing agent; local checks do not authenticate it.',
     files,
@@ -72,8 +75,8 @@ export async function build(inputPath, outputDir, { render = true } = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const [input, output] = process.argv.slice(2);
-    if (!input || !output) throw new Error('Usage: node build_workbooks.mjs capture.json NEW_OUTPUT_DIRECTORY');
-    console.log(JSON.stringify(await build(input, output), null, 2));
+    const [input, output, ...options] = process.argv.slice(2);
+    if (!input || !output) throw new Error('Usage: node build_workbooks.mjs capture.json NEW_OUTPUT_DIRECTORY [--section KEY]');
+    console.log(JSON.stringify(await build(input, output, { selectedKeys: parseSectionArgs(options) }), null, 2));
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

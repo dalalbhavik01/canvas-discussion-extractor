@@ -2,6 +2,8 @@
 
 One JSON file contains `version: 1` and `sections: [...]`. Each section is independently validated. See `tests/discussion.test.mjs` in the repository for synthetic inputs; the skill scripts have no dependency on the tests.
 
+One section is valid; two are never required. If an existing capture contains unrequested cohorts, use `--section EXACT_KEY` (repeat as needed) to select the verified requested keys. Do not infer key selection from array order or fuzzy names. The exporter validates only selected cohorts, retains their original content and writes only their data to `capture.json` and workbook matrices. Its scope record lists excluded keys as `not requested`; it contains no excluded student records. Without selectors, all sections in the supplied capture are processed, so the host must supply a correctly scoped capture or explicit selectors. Unknown/empty/duplicate selections fail without broadening scope.
+
 Each section has:
 
 - `key`: unique filename-safe cohort key, letters/digits/underscore/hyphen, 1-64 characters.

@@ -25,6 +25,14 @@ node /path/to/discussion/scripts/build_workbooks.mjs capture.json outputs/run-00
 python3 /path/to/discussion/scripts/verify_workbooks.py outputs/run-001
 ```
 
+For only one cohort from an existing multi-cohort capture, resolve its exact capture key from verified source mapping and use:
+
+```sh
+node /path/to/discussion/scripts/build_workbooks.mjs capture.json outputs/section-1-run --section EXACT_KEY
+```
+
+The validator also supports `node scripts/prepare.mjs capture.json prepared.json --section EXACT_KEY`. Repeat `--section` to select several keys. Do not use a literal example key or assume "section 1" means the first array entry. The exporter excludes other cohorts from the saved capture and workbook output.
+
 The output directory must be new. If the host does not provide `@oai/artifact-tool`, use its supported spreadsheet tool to write the exact matrices from `prepare.mjs` and run the OOXML verifier. Do not claim the bundled exporter is runnable without its dependency. Any dependency installation must be isolated to a project environment; use a virtual environment for Python downloads. The validator and OOXML verifier use only standard libraries and need no downloads.
 
 The builder requires Python 3.9+ for a standard-library text-preservation step. Set `DISCUSSION_PYTHON` to the host's Python executable if `python3` is unavailable. Artifact Tool can coerce ISO timestamps into numeric dates even in text-formatted ranges, so `restore_text_cells.py` replaces only expected string cells with literal OOXML strings after export. The separate verifier then checks all saved cells and rejects formulas. No dependencies are downloaded for this step.

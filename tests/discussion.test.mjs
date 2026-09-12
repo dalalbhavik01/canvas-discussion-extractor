@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { prepareCapture } from '../skills/discussion/scripts/prepare.mjs';
+import { prepareCapture, selectCapture, parseSectionArgs } from '../skills/discussion/scripts/prepare.mjs';
 
 export function fixture() {
   const authors = [
@@ -160,3 +160,54 @@ test('invalid XML text fails instead of being stripped', () => reject(s => {
 }, /XML-incompatible/));
 test('missing source checks block verified output', () => reject(s => { s.source_checks = []; }, /source spot-check/));
 test('file path traversal in section key fails', () => reject(s => { s.key = '../escape'; }, /section key/));
+
+function twoCohorts() {
+  const data = fixture();
+  const second = structuredClone(data.sections[0]);
+  second.key = 'cohort-B'; second.label = 'Synthetic Cohort B';
+  data.sections.push(second);
+  return data;
+}
+test('only cohort A selected: B excluded even when its data is incomplete', () => {
+  const data = twoCohorts(); data.sections[1].coverage.all_pages_visited = false;
+  const result = prepareCapture(data, { selectedKeys: ['cohort-A'] });
+  assert.deepEqual(result.sections.map(s => s.key), ['cohort-A']);
+  assert.deepEqual(result.scope.skipped_sections, ['cohort-B']);
+  assert.equal(result.scope.skipped_reason, 'not requested');
+});
+test('only cohort B selected: cohort A is not required', () => {
+  const data = twoCohorts(); data.sections[0].entries = [];
+  assert.deepEqual(prepareCapture(data, { selectedKeys: ['cohort-B'] }).sections.map(s => s.key), ['cohort-B']);
+});
+test('one-cohort capture is a normal default request', () => {
+  assert.equal(prepareCapture(fixture()).sections.length, 1);
+});
+test('selected capture contains no excluded student data', () => {
+  const data = twoCohorts(); data.sections[1].students[0].name = 'Excluded synthetic identity';
+  const { capture } = selectCapture(data, ['cohort-A']);
+  assert.ok(!JSON.stringify(capture).includes('Excluded synthetic identity'));
+});
+test('selected key is exact and cannot mean array position or fuzzy name', () => {
+  assert.throws(() => prepareCapture(twoCohorts(), { selectedKeys: ['section 1'] }), /not found/);
+  assert.throws(() => prepareCapture(twoCohorts(), { selectedKeys: ['COHORT-A'] }), /not found/);
+});
+test('empty and duplicate selections fail rather than broadening scope', () => {
+  assert.throws(() => prepareCapture(twoCohorts(), { selectedKeys: [] }), /At least one/);
+  assert.throws(() => prepareCapture(twoCohorts(), { selectedKeys: ['cohort-A', 'cohort-A'] }), /duplicate/);
+});
+test('an invalid requested cohort is not silently skipped', () => {
+  const data = twoCohorts(); data.sections[1].coverage.stable = false;
+  assert.throws(() => prepareCapture(data, { selectedKeys: ['cohort-A', 'cohort-B'] }), /incomplete or unstable/);
+});
+test('selection preserves requested order without changing source input', () => {
+  const data = twoCohorts(); const before = JSON.stringify(data);
+  assert.deepEqual(prepareCapture(data, { selectedKeys: ['cohort-B', 'cohort-A'] }).sections.map(s => s.key), ['cohort-B', 'cohort-A']);
+  assert.equal(JSON.stringify(data), before);
+});
+test('CLI selector accepts exact repeated flags and rejects unknown options', () => {
+  assert.equal(parseSectionArgs([]), undefined);
+  assert.deepEqual(parseSectionArgs(['--section', 'cohort-B']), ['cohort-B']);
+  assert.deepEqual(parseSectionArgs(['--section', 'cohort-B', '--section', 'cohort-A']), ['cohort-B', 'cohort-A']);
+  assert.throws(() => parseSectionArgs(['--section']), /Expected/);
+  assert.throws(() => parseSectionArgs(['--cohort', 'cohort-A']), /Expected/);
+});

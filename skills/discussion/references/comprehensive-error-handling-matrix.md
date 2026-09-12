@@ -2,6 +2,14 @@
 
 | Failure | Level | Safe response | Do not do |
 | --- | --- | --- | --- |
+| User requests only section 1 or only section 2 | L0 | Resolve the requested label; process that cohort only. | Require both links or include the other cohort. |
+| Two URLs provided but one cohort explicitly excluded | L0 | Use the verified selected URL; mark the other not requested. | Treat available URLs as authorization for both. |
+| "Section 1" has no verified mapping | L2 after source inspection | Ask which link/section is intended. | Equate it with first tab or array position. |
+| User narrows scope during extraction | L0 | Stop new work for excluded cohorts; preserve prior evidence privately. | Continue exporting both or delete existing work. |
+| One requested cohort verified, another blocked | L1/L2 per affected stage | Finish independent work; report partial results and remaining issue. | Claim all cohorts complete or silently skip the blocked one. |
+| Invalid data in an unrequested cohort | L0 | Use explicit section selection so it is not validated/exported. | Block the requested section on unrelated data. |
+| User says prepare one cohort for upload | L0 | Deliver that cohort's upload-ready local workbook. | Initiate an unrequested external upload. |
+| User explicitly requests an actual upload | Separate task scope | Resolve target and use an authorized upload workflow, honoring existing permission. | Pretend this extraction skill implements uploading. |
 | Missing discussion URL and no unambiguous current request | L2 | Ask for the intended links. | Reuse previous course IDs. |
 | Several tabs, one matches the provided URL | L0 | Select the matching course/topic. | Choose by recency alone. |
 | Session expired | L2 | Ask user to sign in. | Extract credentials or bypass access. |
@@ -28,3 +36,5 @@
 | Privacy leak or credential-bearing URL in public package | L3 | Stop publication and exclude sensitive records. | Commit captures or tokens. |
 
 Level meanings and recovery ownership are in [error-handling.md](error-handling.md). A file-format workaround never resolves a missing-source problem.
+
+For anything absent from this matrix, use [model-escalation.md](model-escalation.md). The same host model reasons from the actual evidence; it does not need a prewritten answer for every case and must not invent one when evidence is insufficient.

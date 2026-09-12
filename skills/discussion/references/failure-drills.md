@@ -4,6 +4,11 @@ Use synthetic captures or a user-authorized read-only test discussion. Never sim
 
 | Scenario | Expected behavior | Existing evidence |
 | --- | --- | --- |
+| User wants only one cohort from a two-cohort capture | Export only the exact selected key and omit the other cohort's student records | Automated selection tests; browser scope follows agent instructions |
+| Unrequested cohort has invalid source data | Do not block the requested valid cohort | Automated synthetic test |
+| Requested cohort is invalid | Reject it; report partial status if another requested cohort can be delivered | Automated synthetic test plus agent procedure |
+| Unknown or ambiguous section label | Resolve mapping or ask; never default to first entry | Exact-key rejection test; language resolution remains agent-owned |
+| Unlisted edge case or host model changes | Apply model-escalation.md using current evidence and checkpoint | Documented recovery procedure, not an automated provider switch |
 | `\discussion` plus two current URLs | Route to this skill, extract separately, do not create a CoEqual assignment | Trigger documented; live invocation not tested here |
 | DOM virtualizes after scrolling | Accumulate stable IDs and independently reconcile every thread | Browser walkthrough pending |
 | Expanded capture omits an entire root | Reject root coverage despite matching remaining reply counts | Automated synthetic test |

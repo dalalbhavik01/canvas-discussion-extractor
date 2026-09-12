@@ -14,6 +14,8 @@ Install `skills/discussion` in your agent's skills folder, then invoke:
 
 The agent uses an authenticated browser supplied by the user. This is an agent-assisted extraction workflow, not a standalone crawler. It requires no Canvas API token or OAuth integration. Browser access and permitted inspection capabilities depend on the host. No credentials or student records ship with the skill.
 
+One-cohort requests are supported directly: `\discussion <section 1 URL> only section 1`. The agent resolves the selected cohort from source evidence and excludes unrequested cohorts, even when their tabs or captures are available. The exporter supports repeated `--section EXACT_KEY` flags for selecting from an existing capture.
+
 ## Output
 
 Each section gets its own `.xlsx`. The first sheet is `Posts and Replies`, with `Student Name`, `Discussion Post`, `Reply 1`, `Reply 2`, and additional reply columns as needed. Rows represent authors, not threads. Replies belong to their writer, not the author of the thread they answered. An `Audit` sheet maps rows and cells back to entry IDs. Local JSON records preserve extraction evidence and original captured text.
@@ -50,6 +52,8 @@ flowchart TD
 | L3 | Suspected mutation or unsafe action | Stop the action immediately and disclose evidence. |
 
 The host agent owns recovery decisions. See [architecture](docs/agentic-architecture.md), [error handling](skills/discussion/references/error-handling.md), [failure matrix](skills/discussion/references/comprehensive-error-handling-matrix.md), and [verification checklist](skills/discussion/references/verification-checklist.md). Routine read-only actions need no repeated approval. Live-source failures cannot be made to pass by changing expected counts.
+
+Unlisted cases use the [host-model recovery procedure](skills/discussion/references/model-escalation.md): the current model evaluates evidence, selects a permitted recovery, verifies the outcome, and resumes or reports the specific blocker. This is portable across host models; it does not claim automatic provider switching or exhaustive coverage of every possible future failure.
 
 ## Repository Structure
 
@@ -88,6 +92,8 @@ Run the dependency-free checks with Node.js 20 or newer:
 ```sh
 node --test tests/discussion.test.mjs
 ```
+
+With the host's spreadsheet runtime available, `node --test tests/selection_export.test.mjs` also builds and independently reads one-cohort workbooks from two-cohort captures, checking that excluded student data is absent.
 
 To exercise actual workbook exports, generate synthetic captures with `node tests/export_fixture.mjs capture.json`, run the builder and verifier from the transfer guide, then run `DISCUSSION_TEST_EXPORT=/path/to/synthetic/export python3 -m unittest discover -s tests -p 'test_*.py'`. Keep synthetic captures under `outputs/`; never run mutation tests against real student work.
 

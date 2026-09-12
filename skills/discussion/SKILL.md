@@ -19,6 +19,14 @@ If the user supplies just `\discussion`, use discussion links explicitly provide
 
 Produce one workbook per requested cohort, with `Posts and Replies` first. Use `Student Name`, `Discussion Post`, `Reply 1`, `Reply 2`, extending with `Reply 3`, etc. Retain every reply. Attribute content to its writer using verified author IDs, never by thread owner or name alone.
 
+## Cohort Scope
+
+One cohort, multiple cohorts, or a user-selected subset are all normal requests. For "section 1 only, not 2", resolve section 1 from the user's verified mapping/current source and process only that section. Do not open, extract, export, or include section 2 merely because its tab/link/capture is available. Do not ask for a second URL. "Section 1" is not automatically the first tab or first input array element; ask only when the mapping is actually ambiguous.
+
+Record requested/excluded cohorts and selection evidence in run state. If a local capture contains several cohorts, pass explicit `--section KEY` flags to the scripts. Excluded cohorts are `not requested`, never failed/missing/completed. If one of several requested cohorts is blocked, continue independent authorized work and report partial delivery accurately. Do not call the whole request complete. A suspected Canvas mutation pauses all browser interaction.
+
+"Prepare section 1 for upload" produces only section 1's local workbook. An actual CoEqual upload is a separate action requiring the target assignment and applicable authorization; do not turn file preparation into an upload. If that action was already explicitly authorized, do not ask for the same permission again, but keep it outside this extraction-only skill's implemented steps.
+
 ## Boundaries
 
 - Canvas is read-only: open, scroll, paginate, and expand discussion threads. Never reply, edit, publish/unpublish, save, grade, manage discussions, change settings, or enter text into forms. This skill does not upload to CoEqual.
@@ -32,6 +40,8 @@ Produce one workbook per requested cohort, with `Posts and Replies` first. Use `
 Before extracting, read [Workflow](references/workflow.md), [Canvas Read-Only Policy](references/canvas-read-only-policy.md), and [Error Handling](references/error-handling.md). Use [Verification Checklist](references/verification-checklist.md) at checkpoints and final handoff. Read [Data Contract](references/data-contract.md) when capturing or running the exporter. For installation or another agent, read [Transfer](references/transfer.md) and the self-contained [Portable Workflow](references/portable-workflow.md).
 
 Maintain the agent-owned [Run State](references/run-state-template.json) from preflight onwards. Record stages, evidence references, decisions, and unresolved issues as they occur. This is separate from the scripts' exported `prepared.json` and `report.json`; the scripts do not track browser actions. On failures consult the [Error Matrix](references/comprehensive-error-handling-matrix.md). For tests or an independent review, use [Failure Drills](references/failure-drills.md).
+
+For any unlisted edge case, switch to the [Host-Model Recovery Procedure](references/model-escalation.md). The current model evaluates the evidence, chooses a permitted response and verifies its outcome. This is a reasoning mode change, not an automatic provider/model switch. No finite case list guarantees every future UI failure is handled.
 
 1. Identify each current discussion's course, section, title, URL, pagination, filters, and capture time. Never reuse earlier assignment IDs, roster mappings, or grading rules.
 2. Verify thread expansion. Expand using a fresh semantic locator if authorized. If the user says to stop on collapsed threads, stop and ask them to expand instead. Their current instruction overrides this default.

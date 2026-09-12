@@ -7,6 +7,7 @@ For each cohort, record evidence and mark every applicable item `verified`, `unr
 - Intended discussion URL, course, section and title match the current request.
 - Login and permitted browser inspection method are available.
 - User instructions on expansion, ordering and output scope are recorded.
+- Requested and excluded cohort identities are verified; only selected cohorts are captured/exported. One-cohort requests do not require a second cohort.
 - Every interaction has a read-only action decision and resulting observation.
 - Filters and read-state side effects are documented separately.
 
@@ -38,5 +39,6 @@ For each cohort, record evidence and mark every applicable item `verified`, `unr
 - Section row/post/reply counts and exclusions are reported.
 - Unseen edge cases and live-test limitations are stated.
 - No claim of complete extraction is made if source coverage remains unresolved.
+- Partial delivery is identified when a requested cohort remains blocked; excluded cohorts are labeled not requested.
 - Canvas integrity wording matches observed actions and unresolved uncertainty.
 - No Canvas editing, grading or CoEqual uploading is inferred from the extraction request.

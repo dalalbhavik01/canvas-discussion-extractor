@@ -2,6 +2,8 @@
 
 The model running the skill handles recovery. A different model, agent framework, or external service is not required. Record the problem, evidence, decision and result in `run-state.json` using [run-state-template.json](run-state-template.json).
 
+One-cohort/subset requests are L0 scope choices, not errors. Resolve the user's labels against verified course/section identity, then exclude every unrequested cohort. Use the [host-model procedure](model-escalation.md) whenever no listed case fits; it defines decision inputs, permitted fallbacks, verification, retry limits and resuming after a host-model change.
+
 | Level | Use when | Action |
 | --- | --- | --- |
 | L0 | Current action and result match expected evidence | Continue. |
@@ -16,6 +18,8 @@ Do not ask for repeated confirmation merely because the workflow is read-only or
 Create a private run directory at preflight. Copy the state template to `run-state.json`; fill actual IDs, timestamps and references as observed. Checkpoint after each page/cohort capture, reconciliation, export, readback and source review. Keep the raw captures and normalized entries separate. The agent owns this lifecycle; export scripts do not log browser activity or set source verification flags.
 
 After interruption, read the current user instructions, saved checkpoint, and current browser state. Confirm course/topic scope and whether source counts/edits changed. Resume from verified captures only when still applicable. Otherwise recapture the affected scope. Do not overwrite earlier evidence or mix changed versions silently.
+
+If the user narrows scope midway, stop new actions for excluded cohorts and update the request scope. Keep earlier evidence intact locally; do not delete it or include it in the requested output. If the user later adds a cohort, verify its source independently. When multiple requested cohorts have different statuses, run the exporter for each verified subset with explicit selectors and maintain the overall status as partial until all requested cohorts are complete or the user changes scope.
 
 For a page load failure, retry once using a permitted read-only navigation. If still blocked, ask the user to sign in/refresh or provide a source export. For local export failure, preserve the capture, repair the specific failure and rebuild into a new output directory. Do not re-scrape merely because a local workbook failed.
 

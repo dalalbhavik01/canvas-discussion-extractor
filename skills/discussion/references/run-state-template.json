@@ -8,6 +8,19 @@
   "stage": "preflight",
   "status": "in_progress",
   "current_instructions": [],
+  "request_scope": {
+    "requested_sections": [],
+    "excluded_sections": [],
+    "selection_evidence": [],
+    "scope_changes": [],
+    "delivery_status": "not_started"
+  },
+  "host_recovery": {
+    "host_model_if_known": null,
+    "active_issue": null,
+    "attempted_actions": [],
+    "next_verification": null
+  },
   "sources": [],
   "sections": [],
   "artifacts": {

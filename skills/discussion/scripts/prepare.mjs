@@ -36,13 +36,41 @@ function attachmentText(entry) {
     `\n\n[Attachment reference]\n${file.name}\n${file.url}`).join('');
 }
 
-export function prepareCapture(input) {
+export function selectCapture(input, selectedKeys) {
   requireThat(input?.version === 1 && Array.isArray(input.sections) && input.sections.length > 0,
     'Expected version 1 and at least one section');
   unique(input.sections.map(s => s.key), 'section keys');
   unique(input.sections.map(s => s.key.toLowerCase()), 'case-insensitive section keys');
-  const sections = input.sections.map(prepareSection);
-  return { version: 1, capture_sha256: createHash('sha256').update(signature(input)).digest('hex'), sections };
+  const available = new Map(input.sections.map(section => [section.key, section]));
+  const requested = selectedKeys === undefined ? [...available.keys()] : selectedKeys;
+  unique(requested, 'requested section keys');
+  requireThat(requested.length > 0, 'At least one section must be requested');
+  for (const key of requested) requireThat(available.has(key), `Requested section not found: ${key}`);
+  return {
+    capture: { version: 1, sections: requested.map(key => available.get(key)) },
+    scope: {
+      requested_sections: [...requested],
+      skipped_sections: [...available.keys()].filter(key => !requested.includes(key)),
+      skipped_reason: 'not requested',
+    },
+  };
+}
+
+export function prepareCapture(input, { selectedKeys } = {}) {
+  const { capture, scope } = selectCapture(input, selectedKeys);
+  const sections = capture.sections.map(prepareSection);
+  return { version: 1, capture_sha256: createHash('sha256').update(signature(capture)).digest('hex'), scope, sections };
+}
+
+export function parseSectionArgs(args) {
+  if (args.length === 0) return undefined;
+  const keys = [];
+  for (let i = 0; i < args.length; i += 2) {
+    requireThat(args[i] === '--section' && nonempty(args[i + 1]) && !args[i + 1].startsWith('--'),
+      'Expected --section EXACT_CAPTURE_KEY (repeat for multiple sections)');
+    keys.push(args[i + 1]);
+  }
+  return keys;
 }
 
 function prepareSection(section) {
@@ -202,9 +230,9 @@ export function columnName(number) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const [inputPath, outputPath] = process.argv.slice(2);
-    requireThat(inputPath && outputPath, 'Usage: node prepare.mjs capture.json prepared.json');
-    const result = prepareCapture(JSON.parse(await fs.readFile(inputPath, 'utf8')));
+    const [inputPath, outputPath, ...options] = process.argv.slice(2);
+    requireThat(inputPath && outputPath, 'Usage: node prepare.mjs capture.json prepared.json [--section KEY]');
+    const result = prepareCapture(JSON.parse(await fs.readFile(inputPath, 'utf8')), { selectedKeys: parseSectionArgs(options) });
     await fs.writeFile(outputPath, JSON.stringify(result, null, 2), { flag: 'wx' });
     console.log(JSON.stringify(result.sections.map(s => ({ section: s.key, ...s.summary }))));
   } catch (error) { console.error(error.message); process.exitCode = 1; }
