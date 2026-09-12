@@ -73,6 +73,48 @@ class VerificationTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             verifier.verify(self.folder)
 
+    def change_prepared(self, change):
+        file = self.folder / "prepared.json"
+        data = json.loads(file.read_text())
+        change(data)
+        file.write_text(json.dumps(data))
+
+    def test_empty_manifest_cannot_pass(self):
+        self.change_prepared(lambda data: data.update(sections=[]))
+        with self.assertRaisesRegex(ValueError, "nonempty section"):
+            verifier.verify(self.folder)
+        self.assertFalse((self.folder / "VERIFIED.json").exists())
+
+    def test_nonobject_manifest_rejected(self):
+        (self.folder / "prepared.json").write_text("null")
+        with self.assertRaisesRegex(ValueError, "Expected an object"):
+            verifier.verify(self.folder)
+
+    def test_duplicate_section_cannot_pass(self):
+        self.change_prepared(lambda data: data["sections"].append(data["sections"][0]))
+        with self.assertRaisesRegex(ValueError, "Duplicate section"):
+            verifier.verify(self.folder)
+
+    def test_unsafe_section_key_rejected_before_file_read(self):
+        self.change_prepared(lambda data: data["sections"][0].update(key="../outside"))
+        with self.assertRaisesRegex(ValueError, "Invalid section key"):
+            verifier.verify(self.folder)
+
+    def test_extra_cohort_workbook_rejected(self):
+        shutil.copyfile(self.workbook, self.folder / "unrequested-cohort.xlsx")
+        with self.assertRaisesRegex(ValueError, "outside selected scope"):
+            verifier.verify(self.folder)
+
+    def test_missing_sheet_manifest_rejected(self):
+        self.change_prepared(lambda data: data["sections"][0].update(sheets=[]))
+        with self.assertRaisesRegex(ValueError, "Invalid sheet manifest"):
+            verifier.verify(self.folder)
+
+    def test_nonrectangular_manifest_rejected(self):
+        self.change_prepared(lambda data: data["sections"][0]["sheets"][0]["values"][1].pop())
+        with self.assertRaisesRegex(ValueError, "Nonrectangular"):
+            verifier.verify(self.folder)
+
 
 if __name__ == "__main__":
     unittest.main()

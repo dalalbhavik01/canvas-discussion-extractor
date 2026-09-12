@@ -1,5 +1,5 @@
 {
-  "template_version": 1,
+  "template_version": 2,
   "managed_by": "host_agent",
   "run_id": null,
   "primary_trigger": "\\discussion",
@@ -20,6 +20,16 @@
     "active_issue": null,
     "attempted_actions": [],
     "next_verification": null
+  },
+  "checkpoint_recovery": {
+    "checkpoint_id": null,
+    "previous_checkpoint_path": null,
+    "workflow_version_if_known": null,
+    "file_hashes": [],
+    "resume_gate_status": "not_assessed",
+    "source_freshness": "unresolved",
+    "invalidated_stages": [],
+    "handoffs": []
   },
   "sources": [],
   "sections": [],

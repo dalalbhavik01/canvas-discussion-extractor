@@ -53,6 +53,8 @@ For any unlisted edge case, switch to the [Host-Model Recovery Procedure](refere
 
 ## Special Cases
 
+- On interruption, model handoff or rollback, use [Checkpoint Recovery](references/checkpoint-recovery.md). Restore verified local evidence only, invalidate dependent outputs when inputs change, and never undo Canvas state.
+
 - Keep all reply depths; separate peer replies from self-follow-ups and instructor replies using verified authorship. Self-follow-ups remain in the audit and original capture, not peer reply columns.
 - Preserve confirmed quoted content separately in the capture. Exclude only a quote demonstrably copied from another entry; never delete all blockquotes or matching phrases heuristically.
 - Retain attachment names/links and accessible media descriptions. An attachment-only submission is not a blank submission. If needed content is inaccessible, report it and mark the capture incomplete.

@@ -24,6 +24,8 @@ For each cohort, record evidence and mark every applicable item `verified`, `unr
 
 ## Workbook
 
+- Prepared manifest is nonempty, well-formed and has unique safe section keys; no unrelated workbook is present.
+
 - One file per requested cohort; first sheet is `Posts and Replies`.
 - Headers start `Student Name`, `Discussion Post`, `Reply 1`, `Reply 2`.
 - Additional replies appear in additional columns without a cap.
@@ -33,6 +35,8 @@ For each cohort, record evidence and mark every applicable item `verified`, `unr
 - Representative views are legible; long-cell limitations are disclosed.
 
 ## Final Source Review
+
+- After interruptions, checkpoint files/hashes, source freshness and dependent-stage invalidation were assessed under checkpoint-recovery.md.
 
 - Source spot-checks cover page boundaries and present exception cases.
 - Source is stable across the capture interval, or changed scope was reverified.

@@ -31,6 +31,11 @@
 | Excel coerces text, adds formula or drops characters | L1 | Repair local serialization and reverify every affected cell. | Modify authored wording or waive mismatch. |
 | Cell exceeds Excel's limit | L2 | Preserve original capture and agree on a lossless alternative. | Silently truncate. |
 | Existing output directory | L1 | Use a fresh directory. | Overwrite a previous verified run. |
+| Context lost, model changed, or older checkpoint requested | L1 or L2 | Follow checkpoint-recovery.md; verify hashes, scope and current source before resume. | Assume model memory transferred or revert Canvas. |
+| Missing/corrupt checkpoint or changed source with unchanged counts | L1, then L2 | Use an earlier verified record or recapture affected source; invalidate derived output. | Trust counts alone or merge conflicting versions. |
+| Disk full, interrupted file write or missing exporter dependency | L1, then L2 | Preserve inputs; rebuild into a fresh approved directory using supported tools. | Delete unrelated files, install globally or deliver partial files. |
+| Tool rate limit or timeout | L1, then L2 | Respect observed retry timing and bounded retries. | Retry indefinitely or secretly switch providers. |
+| Empty/malformed manifest or extra cohort workbook | L1 | Reject verification and regenerate scoped output from verified input. | Produce a success marker for zero sections or unrelated files. |
 | Possible CoEqual column limitation | L2 only when import is requested | Verify current supported format and retain full export. | Drop Reply 3+ silently. |
 | Ambiguous click or suspected course edit | L3 | Stop browser interaction, report evidence and uncertainty. | Guess harmlessness or try to reverse it. |
 | Privacy leak or credential-bearing URL in public package | L3 | Stop publication and exclude sensitive records. | Commit captures or tokens. |

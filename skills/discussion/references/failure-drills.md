@@ -20,6 +20,9 @@ Use synthetic captures or a user-authorized read-only test discussion. Never sim
 | Quote/attachment unresolved | Refuse verified export; preserve source | Automated synthetic test |
 | Timestamp/formula-like text coerced by Excel | Preserve literal string and independently check saved cells | Synthetic export and readback test |
 | Saved workbook is changed after export | Reject comparison and remove stale verification marker | Automated synthetic mutation test |
+| Empty, duplicate, unsafe or malformed prepared manifest | Reject before reporting success | Automated verifier regression tests |
+| Extra workbook from an excluded cohort | Reject scoped output directory | Automated verifier regression test |
+| Interrupted state write, corrupt checkpoint or same-count source edit | Restore only applicable verified local evidence; invalidate derived stages | Recovery protocol documented; live handoff test pending |
 | Browser session fails mid-capture | Read checkpoint, verify scope/stability, resume safely | Agent walkthrough pending |
 | Expand click target is ambiguous | Do not click; re-inspect permitted controls | Live test deliberately not attempted |
 | Actual click may have touched Publish | Stop and disclose immediately, no attempted reversal | No real mutation test |

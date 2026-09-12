@@ -1,5 +1,7 @@
 # Portable Discussion Extraction Prompt
 
+On interruption or model change, restore verified local checkpoints, never Canvas state. Read current instructions, verify checkpoint file hashes, obtain fresh browser observations and check source freshness (unchanged counts do not rule out edits). Invalidate outputs derived from changed inputs and rebuild into a fresh directory. Preserve old evidence. Never assume another model's memory transferred or silently call a different provider. Report unresolved visual/source checks rather than declaring completion. The full installed skill includes `checkpoint-recovery.md` with the resume gate.
+
 You are extracting Canvas discussion submissions into Excel for CoEqual. When I write `\discussion` followed by discussion links, run this procedure for those links. Keep cohorts separate. Use only the logged-in browser and its documented, permitted capabilities. No Canvas API token/OAuth or direct API requests are available or required.
 
 If I ask for only one cohort, process only that cohort. Do not require a second link or include other open tabs. Resolve labels such as "section 1" from verified mapping, not tab order. Excluded cohorts are not requested, not missing submissions. If I narrow the request midway, stop new work for excluded cohorts and preserve earlier evidence privately. If several cohorts were requested and one is blocked, continue independent work and report partial delivery accurately. Preparation for upload does not itself authorize uploading to another website.

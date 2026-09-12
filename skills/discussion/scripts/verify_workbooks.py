@@ -5,6 +5,7 @@ import json
 import posixpath
 import re
 import sys
+import tempfile
 import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -78,8 +79,36 @@ def verify(directory):
         marker.unlink()
     prepared_bytes = (directory / "prepared.json").read_bytes()
     prepared = json.loads(prepared_bytes)
+    if not isinstance(prepared, dict):
+        raise ValueError("Expected an object for the prepared manifest")
+    sections = prepared.get("sections")
+    if prepared.get("version") != 1 or not isinstance(sections, list) or not sections:
+        raise ValueError("Expected version 1 and a nonempty section manifest")
+    keys = [section.get("key") for section in sections if isinstance(section, dict)]
+    if len(keys) != len(sections) or any(
+        not isinstance(key, str) or not re.fullmatch(r"[a-zA-Z0-9_-]{1,64}", key) for key in keys
+    ):
+        raise ValueError("Invalid section key in prepared manifest")
+    if len({key.lower() for key in keys}) != len(keys):
+        raise ValueError("Duplicate section key in prepared manifest")
+    expected_files = {f"{key}.xlsx" for key in keys}
+    actual_files = {item.name for item in directory.iterdir() if item.suffix.lower() == ".xlsx"}
+    if actual_files - expected_files:
+        raise ValueError("Unexpected workbook files outside selected scope")
+    for section in sections:
+        sheets = section.get("sheets")
+        if not isinstance(sheets, list) or len(sheets) != 2 or any(not isinstance(s, dict) for s in sheets):
+            raise ValueError("Invalid sheet manifest")
+        if [sheet.get("name") for sheet in sheets] != ["Posts and Replies", "Audit"]:
+            raise ValueError("Invalid sheet manifest order/names")
+        for sheet in sheets:
+            rows = sheet.get("values")
+            if not isinstance(rows, list) or not rows or not isinstance(rows[0], list) or not rows[0]:
+                raise ValueError("Missing sheet values/header")
+            if any(not isinstance(row, list) or len(row) != len(rows[0]) for row in rows):
+                raise ValueError("Nonrectangular prepared sheet")
     verified = []
-    for section in prepared["sections"]:
+    for section in sections:
         path = directory / f"{section['key']}.xlsx"
         actual = read_workbook(path)
         expected = section["sheets"]
@@ -101,7 +130,16 @@ def verify(directory):
     result = {"status": "saved-workbook-cells-match-prepared-capture",
               "live_source_verified_by_this_script": False,
               "prepared_sha256": hashlib.sha256(prepared_bytes).hexdigest(), "files": verified}
-    marker.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    # Publish a complete marker atomically; interrupted verification must not look successful.
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=directory, delete=False) as stream:
+            temporary = Path(stream.name)
+            json.dump(result, stream, indent=2)
+        temporary.replace(marker)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
     return result
 
 

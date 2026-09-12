@@ -15,6 +15,8 @@ Do not ask for repeated confirmation merely because the workflow is read-only or
 
 ## Recovery Record
 
+Apply [Checkpoint Recovery](checkpoint-recovery.md) when a run is interrupted, a host model changes, or an earlier verified local state must be restored. Verify file hashes and source freshness before reuse; never treat a checkpoint label as evidence.
+
 Create a private run directory at preflight. Copy the state template to `run-state.json`; fill actual IDs, timestamps and references as observed. Checkpoint after each page/cohort capture, reconciliation, export, readback and source review. Keep the raw captures and normalized entries separate. The agent owns this lifecycle; export scripts do not log browser activity or set source verification flags.
 
 After interruption, read the current user instructions, saved checkpoint, and current browser state. Confirm course/topic scope and whether source counts/edits changed. Resume from verified captures only when still applicable. Otherwise recapture the affected scope. Do not overwrite earlier evidence or mix changed versions silently.

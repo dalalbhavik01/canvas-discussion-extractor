@@ -39,21 +39,15 @@ See [transfer instructions](skills/discussion/references/transfer.md) for instal
 
 ## Workflow and Recovery
 
-```mermaid
-flowchart TD
-    A[User sends discussion links] --> B[Preflight and run checkpoint]
-    B --> C{Canvas action is read-only?}
-    C -->|Yes| D[Expand and capture every page and reply]
-    C -->|No or uncertain| X[Stop the action and report]
-    D --> E[Reconcile roots, replies, and student IDs]
-    E --> F{Source coverage verified?}
-    F -->|No| R[Classify issue and use a safe recovery]
-    R --> D
-    F -->|Yes| G[Create one Excel file per cohort]
-    G --> H[Read saved cells and compare with capture]
-    H --> I[Source spot-checks and visual review]
-    I --> J[Deliver files and verification summary]
-```
+### Simple Overview
+
+![Simple discussion extraction overview](docs/workflow-overview.svg)
+
+### Detailed Workflow
+
+![Detailed discussion verification and recovery workflow](docs/workflow-detailed.svg)
+
+The detailed flow is also available as [editable Mermaid source](docs/workflow-detailed.mmd). The diagrams describe agent responsibilities and verification gates, not an unattended browser engine.
 
 | Level | Meaning | Response |
 | --- | --- | --- |
@@ -66,6 +60,8 @@ The host agent owns recovery decisions. See [architecture](docs/agentic-architec
 
 Unlisted cases use the [host-model recovery procedure](skills/discussion/references/model-escalation.md): the current model evaluates evidence, selects a permitted recovery, verifies the outcome, and resumes or reports the specific blocker. This is portable across host models; it does not claim automatic provider switching or exhaustive coverage of every possible future failure.
 
+[Checkpoint recovery and model handoff](skills/discussion/references/checkpoint-recovery.md) defines local rollback, hash checks, source freshness and downstream invalidation. There is no Canvas rollback and no automatic model-provider switch. See [audit and test boundaries](docs/reliability-audit.md) for implemented safeguards and live-testing gaps.
+
 ## Repository Structure
 
 ```text
@@ -74,6 +70,10 @@ config.example.json
 docs/
   agentic-architecture.md
   old-repo-comparison.md
+  reliability-audit.md
+  workflow-overview.svg
+  workflow-detailed.svg
+  workflow-detailed.mmd
 skills/discussion/
   SKILL.md
   agents/openai.yaml
@@ -82,6 +82,7 @@ skills/discussion/
     canvas-read-only-policy.md
     error-handling.md
     model-escalation.md
+    checkpoint-recovery.md
     comprehensive-error-handling-matrix.md
     verification-checklist.md
     run-state-template.json

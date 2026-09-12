@@ -36,6 +36,8 @@ The example values are not a default answer. Populate them for the actual case a
 
 ## Model Changes or Delegation
 
+Use [Checkpoint Recovery](checkpoint-recovery.md) for model changes, local rollback, interrupted writes, stale source checks and invalidating downstream results. Rollback never alters Canvas and does not automatically select another model.
+
 If the user changes the host model mid-run, the new model reads the same checkpoint, current instructions and evidence before resuming. Do not assume it remembers the previous model's work. A separate review agent may be used when supported and authorized, with the minimum necessary local evidence. The main host remains responsible. Lack of a second model does not itself block recovery.
 
 Do not automatically send student data to another provider, change account settings, spend on an external model, or create another task merely because an edge case occurred. Ask only if a genuinely necessary action requires missing user authorization or information. If available tools cannot safely establish the answer, report the unresolved limitation instead of asserting that AI can handle every case.
