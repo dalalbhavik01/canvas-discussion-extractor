@@ -8,7 +8,7 @@ The initial discussion version followed the core safety and portability approach
 | --- | --- | --- |
 | Primary `\createAssignment` trigger | Primary `\discussion` trigger | Discussion URLs initiate extraction. |
 | Native `$coequal-assignment-creator` skill | Native `$discussion` skill | Installed as `discussion`. |
-| README, config and workflow diagrams | README, example config, two SVG diagrams and detailed Mermaid source | No account-specific default URLs. |
+| README, config and workflow diagrams | README, example config, original Mermaid diagram and new detailed SVG with Mermaid source | No account-specific default URLs. |
 | Framework-neutral agentic architecture | `docs/agentic-architecture.md` | Adds executable export/validation tools; browser orchestration remains agent-assisted. |
 | Canvas action gate/read-only policy | `references/canvas-read-only-policy.md` | Read-state side effects explicitly distinguished from course-content edits. |
 | L0-L3 escalation and error taxonomy | `references/error-handling.md` and failure matrix | Recovery decisions concern capture truth and output integrity. |
