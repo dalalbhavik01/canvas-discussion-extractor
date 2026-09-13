@@ -8,6 +8,24 @@ import { fileURLToPath } from 'node:url';
 import { fixture } from './discussion.test.mjs';
 import { build } from '../skills/discussion/scripts/build_workbooks.mjs';
 
+test('actual Excel export processes both supplied cohorts without selectors', async t => {
+  const data = fixture();
+  const second = structuredClone(data.sections[0]);
+  second.key = 'cohort-B'; second.label = 'Synthetic Cohort B'; data.sections.push(second);
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'discussion-default-'));
+  t.after(() => fs.rm(directory, { recursive: true, force: true }));
+  const source = path.join(directory, 'source.json');
+  const output = path.join(directory, 'output');
+  await fs.writeFile(source, JSON.stringify(data));
+  const files = await build(source, output, { render: false });
+  assert.deepEqual(files.map(file => file.section), ['cohort-A', 'cohort-B']);
+  assert.deepEqual((await fs.readdir(output)).filter(file => file.endsWith('.xlsx')).sort(),
+    ['cohort-A.xlsx', 'cohort-B.xlsx']);
+  const verifier = fileURLToPath(new URL('../skills/discussion/scripts/verify_workbooks.py', import.meta.url));
+  const readback = JSON.parse(execFileSync(process.env.DISCUSSION_PYTHON || 'python3', [verifier, output], { encoding: 'utf8' }));
+  assert.equal(readback.files.length, 2);
+});
+
 for (const selected of ['cohort-A', 'cohort-B']) {
   test(`actual Excel export contains only ${selected}`, async t => {
     const data = fixture();

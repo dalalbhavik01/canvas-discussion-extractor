@@ -2,6 +2,10 @@
 
 | Failure | Level | Safe response | Do not do |
 | --- | --- | --- | --- |
+| One discussion link supplied | L0 | Process that source only, with no extra scope command or second-link prompt. | Add another source from an open tab or previous run. |
+| Two discussion links supplied | L0 | Process both independently without selector commands or scope confirmation. | Require "both cohorts" or "only" text. |
+| Repeated URLs identify the same discussion | L0 after identity verification | Process the verified source once and report deduplication. | Invent an additional cohort workbook. |
+| One supplied link is invalid/inaccessible | L2 for that source | Complete independent work; report partial delivery and the specific source issue. | Silently discard the link or claim all work complete. |
 | User requests only section 1 or only section 2 | L0 | Resolve the requested label; process that cohort only. | Require both links or include the other cohort. |
 | Two URLs provided but one cohort explicitly excluded | L0 | Use the verified selected URL; mark the other not requested. | Treat available URLs as authorization for both. |
 | "Section 1" has no verified mapping | L2 after source inspection | Ask which link/section is intended. | Equate it with first tab or array position. |

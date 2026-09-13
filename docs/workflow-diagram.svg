@@ -20,7 +20,7 @@
   <text class="sub" x="40" y="71">Selected cohorts. Every reply. Verified files. Canvas stays read-only.</text>
   <rect class="box" x="40" y="106" width="535" height="72" rx="8"/>
   <text class="label" x="62" y="135">1. Select the Cohorts</text>
-  <text class="body" x="62" y="160">Provide current discussion links; one cohort or a subset.</text>
+  <text class="body" x="62" y="160">One link: one cohort. Two links: both cohorts.</text>
   <path class="line" d="M307 178 V199"/>
   <rect class="safe" x="40" y="199" width="535" height="72" rx="8"/>
   <text class="label" x="62" y="228">2. Read Canvas Only</text>

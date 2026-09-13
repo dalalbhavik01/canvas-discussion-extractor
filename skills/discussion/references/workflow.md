@@ -2,7 +2,7 @@
 
 ## 1. Start From the Current Page
 
-Use the user's URLs and logged-in browser. Follow the browser tool's setup documentation. Prefer selecting the existing matching tab. Match course/discussion IDs as well as visible titles. Record actual section labels from Canvas or user-provided evidence. If one discussion spans several sections, capture membership and filter scope explicitly; do not infer section membership from the URL alone.
+Use the discussion URLs explicitly supplied for this invocation: one link processes one source, two links process both. No extra cohort-selection command or confirmation is required. Do not add links from ambient tabs or prior runs. The agent handles any internal capture selectors. Use the logged-in browser and its setup documentation; prefer the existing matching tab. Match course/discussion IDs as well as titles. Record actual section labels from Canvas or user-provided evidence. If one discussion spans several sections, capture membership and filter scope explicitly; do not infer section membership from the URL alone.
 
 Record the discussion prompt and rubric only if separately requested. For this skill, the required deliverable is student discussion content. Do not initiate grading, assignment creation, or uploads.
 

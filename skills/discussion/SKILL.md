@@ -21,9 +21,13 @@ Produce one workbook per requested cohort, with `Posts and Replies` first. Use `
 
 ## Cohort Scope
 
-One cohort, multiple cohorts, or a user-selected subset are all normal requests. For "section 1 only, not 2", resolve section 1 from the user's verified mapping/current source and process only that section. Do not open, extract, export, or include section 2 merely because its tab/link/capture is available. Do not ask for a second URL. "Section 1" is not automatically the first tab or first input array element; ask only when the mapping is actually ambiguous.
+Infer scope directly from the discussion links explicitly supplied for the current invocation. One link means process that discussion only. Two links mean process both and produce separate cohort workbooks. Do not require extra commands, flags, cohort labels, or "only cohort 1" text, and do not ask the user to confirm this normal scope. Do not add links from ambient tabs, previous runs or an old capture. Do not ask for a second link when one was supplied.
 
-Record requested/excluded cohorts and selection evidence in run state. If a local capture contains several cohorts, pass explicit `--section KEY` flags to the scripts. Excluded cohorts are `not requested`, never failed/missing/completed. If one of several requested cohorts is blocked, continue independent authorized work and report partial delivery accurately. Do not call the whole request complete. A suspected Canvas mutation pauses all browser interaction.
+Verify course/topic identity from each link and observed Canvas content; do not infer actual section labels from link order. Repeated URLs for the same verified discussion are one source, not an extra cohort. An invalid/inaccessible second link remains an unresolved part of the request: continue independent work and report partial results, never silently drop it. Ask only for genuinely missing access, an invalid source or ambiguous mapping.
+
+If the user voluntarily supplies a narrower scope or changes the request, honor that explicit instruction; it is an optional override, not required command syntax. Never process another cohort merely because its tab or capture is available.
+
+Record requested/excluded cohorts and link-to-source evidence in run state. Build the capture from the current invocation's links only. If reusing a capture containing additional cohorts, the agent resolves and passes internal `--section KEY` selectors itself; never require the user to type these implementation flags. Excluded cohorts are `not requested`, never failed/missing/completed. If one requested cohort is blocked, report partial delivery accurately. A suspected Canvas mutation pauses all browser interaction.
 
 "Prepare section 1 for upload" produces only section 1's local workbook. An actual CoEqual upload is a separate action requiring the target assignment and applicable authorization; do not turn file preparation into an upload. If that action was already explicitly authorized, do not ask for the same permission again, but keep it outside this extraction-only skill's implemented steps.
 

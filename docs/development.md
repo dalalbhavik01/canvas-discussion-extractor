@@ -28,7 +28,7 @@ With the spreadsheet runtime available:
 node --test tests/selection_export.test.mjs
 ```
 
-This runs capture tests plus actual one-cohort exports from two-cohort captures. It independently reads each output and verifies excluded student data is absent. The current suite reports 43 tests in total; do not add the capture suite's count again.
+This runs capture tests plus default two-cohort and selected one-cohort exports. It independently reads each output and verifies excluded student data is absent. The current suite reports 45 tests in total; do not add the capture suite's count again.
 
 ## Workbook Verification
 
@@ -42,7 +42,7 @@ python3 skills/discussion/scripts/verify_workbooks.py outputs/test-run-001/expor
 DISCUSSION_TEST_EXPORT=outputs/test-run-001/export python3 -m unittest discover -s tests -p test_verifier.py -v
 ```
 
-The fixture contains synthetic students only. The 12 Python tests copy it to temporary directories before altering files. They test changed text, formulas, extra content, missing workbooks and invalid manifests. Never run mutation tests against student submissions. The combined count is 43 Node tests plus 12 Python tests: 55.
+The fixture contains synthetic students only. The 12 Python tests copy it to temporary directories before altering files. They test changed text, formulas, extra content, missing workbooks and invalid manifests. Never run mutation tests against student submissions. The combined count is 45 Node tests plus 12 Python tests: 57.
 
 ## Review Before Publishing
 

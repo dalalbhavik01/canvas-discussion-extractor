@@ -11,7 +11,7 @@ This is an agentic workflow with deterministic local helpers, not a guarantee of
 
 ## Evidence Boundaries
 
-The audit regression run passed 43 Node capture/selection/export tests and 12 Python workbook-verifier tests. These 55 tests use synthetic records only; they do not constitute a live Canvas or model-handoff test.
+The latest regression run passed 45 Node capture/selection/export tests and 12 Python workbook-verifier tests. These 57 tests include default one/two-cohort processing without selectors and use synthetic records only; they do not constitute a live Canvas or model-handoff test.
 
 | Area | Evidence |
 | --- | --- |

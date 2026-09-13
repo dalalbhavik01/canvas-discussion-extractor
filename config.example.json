@@ -1,6 +1,7 @@
 {
   "primary_trigger": "\\discussion",
   "native_codex_skill": "$discussion",
+  "scope_policy": "discussion_links_in_current_invocation",
   "default_output_root": "outputs",
   "canvas_policy": "read_only",
   "coequal_policy": "local_files_only",

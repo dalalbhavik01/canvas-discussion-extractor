@@ -27,6 +27,8 @@ python3 /path/to/discussion/scripts/verify_workbooks.py outputs/run-001
 
 For only one cohort from an existing multi-cohort capture, resolve its exact capture key from verified source mapping and use:
 
+These are internal exporter commands for the agent/developer. End users only supply `\discussion` and their current link(s): one link selects one source, two select both. Never ask the user to add these flags to the skill invocation.
+
 ```sh
 node /path/to/discussion/scripts/build_workbooks.mjs capture.json outputs/section-1-run --section EXACT_KEY
 ```

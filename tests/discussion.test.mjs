@@ -182,6 +182,12 @@ test('only cohort B selected: cohort A is not required', () => {
 test('one-cohort capture is a normal default request', () => {
   assert.equal(prepareCapture(fixture()).sections.length, 1);
 });
+test('two-cohort capture processes both by default without selectors', () => {
+  const result = prepareCapture(twoCohorts());
+  assert.deepEqual(result.sections.map(s => s.key), ['cohort-A', 'cohort-B']);
+  assert.deepEqual(result.scope.requested_sections, ['cohort-A', 'cohort-B']);
+  assert.deepEqual(result.scope.skipped_sections, []);
+});
 test('selected capture contains no excluded student data', () => {
   const data = twoCohorts(); data.sections[1].students[0].name = 'Excluded synthetic identity';
   const { capture } = selectCapture(data, ['cohort-A']);
@@ -198,6 +204,7 @@ test('empty and duplicate selections fail rather than broadening scope', () => {
 test('an invalid requested cohort is not silently skipped', () => {
   const data = twoCohorts(); data.sections[1].coverage.stable = false;
   assert.throws(() => prepareCapture(data, { selectedKeys: ['cohort-A', 'cohort-B'] }), /incomplete or unstable/);
+  assert.throws(() => prepareCapture(data), /incomplete or unstable/);
 });
 test('selection preserves requested order without changing source input', () => {
   const data = twoCohorts(); const before = JSON.stringify(data);

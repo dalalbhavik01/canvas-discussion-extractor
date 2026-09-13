@@ -15,7 +15,7 @@ The AI agent reads selected discussions, captures posts and replies with source 
 ## What It Does
 
 - Extracts all discussion posts and replies, including replies beyond the second and nested replies.
-- Supports one cohort, multiple cohorts, or an explicitly selected subset.
+- Automatically processes the discussion links supplied: one link for one cohort, two links for both.
 - Keeps cohort files separate and attributes each reply to its writer using verified student IDs.
 - Preserves authored wording, paragraph breaks, links, and verified attachment references.
 - Reconciles root threads and reply counts to detect incomplete captures and virtualized-page gaps.
@@ -37,14 +37,9 @@ For both cohorts:
 \discussion [cohort 1 discussion link] [cohort 2 discussion link]
 ```
 
-For a selected cohort:
+The links are the scope. No extra flags, cohort commands, or "only cohort 1" instruction is required. Supply one link to process that discussion only; supply two to process both separately. Other open tabs and previously used links are not added automatically.
 
-```text
-\discussion [cohort 1 discussion link] [cohort 2 discussion link]
-Only cohort 1. Do not extract cohort 2.
-```
-
-The agent verifies the mapping; "cohort 1" does not automatically mean the first open tab.
+The agent verifies each discussion's identity from Canvas. If one of two links is inaccessible, it finishes independent work on the other and reports the blocked link; it does not silently treat the request as a successful one-link run.
 
 For Codex accounts with the skill installed:
 
@@ -181,7 +176,7 @@ The [documentation index](docs/README.md) links every guide by purpose. Operatio
 
 1. Install the complete `skills/discussion` folder in your host's skills location, or supply the portable prompt.
 2. Sign in to Canvas manually in a browser the host can operate.
-3. Provide current discussion links and any cohort-selection or ordering instructions.
+3. Provide one current discussion link or both links. No extra cohort-selection instruction is needed.
 4. Run `\discussion [Canvas discussion link]`.
 5. Let the agent capture, reconcile, export and verify using the workflow's gates.
 6. Review the returned file links, cohort totals and limitations before using the workbooks in CoEqual.
@@ -211,7 +206,7 @@ Do not transfer login cookies, credentials, student records, grades or machine-s
 
 ## Testing and Limitations
 
-The latest reliability audit passed **55 synthetic tests** covering capture validation, cohort selection, workbook exports and verifier failures. Live Canvas extraction, real model handoffs and CoEqual import acceptance still require supervised verification. The safeguards do not guarantee coverage of every future UI failure.
+The latest reliability audit passed **57 synthetic tests** covering capture validation, automatic one/two-cohort processing, workbook exports and verifier failures. Live Canvas extraction, real model handoffs and CoEqual import acceptance still require supervised verification. The safeguards do not guarantee coverage of every future UI failure.
 
 See [development and test commands](docs/development.md), [failure drills](skills/discussion/references/failure-drills.md), and the [reliability audit](docs/reliability-audit.md) for reproducible checks and remaining limits.
 
