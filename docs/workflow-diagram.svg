@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="620" viewBox="0 0 980 620" role="img" aria-labelledby="title desc">
+  <title id="title">Canvas Discussion Extraction Overview</title>
+  <desc id="desc">Select cohorts, read Canvas only, capture all posts and replies, reconcile source evidence, then export and verify separate Excel files. Unresolved checks pause delivery. The host restores local checkpoints only and never rolls back Canvas.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L7 4 L0 8Z" fill="#4b5960"/></marker>
+    <style>
+      text { font-family: Arial, sans-serif; fill: #20343b; }
+      .title { font-size: 26px; font-weight: 700; }
+      .sub { font-size: 15px; fill: #53666e; }
+      .label { font-size: 19px; font-weight: 700; }
+      .body { font-size: 16px; }
+      .box { fill: #fff; stroke: #afc1c8; stroke-width: 1.5; }
+      .safe { fill: #eef8f2; stroke: #438263; stroke-width: 1.5; }
+      .warn { fill: #fff5e9; stroke: #ac8035; stroke-width: 1.5; }
+      .line { fill: none; stroke: #4b5960; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="980" height="620" fill="#f8fafb"/>
+  <text class="title" x="40" y="44">Canvas Discussion Extraction</text>
+  <text class="sub" x="40" y="71">Selected cohorts. Every reply. Verified files. Canvas stays read-only.</text>
+  <rect class="box" x="40" y="106" width="535" height="72" rx="8"/>
+  <text class="label" x="62" y="135">1. Select the Cohorts</text>
+  <text class="body" x="62" y="160">Provide current discussion links; one cohort or a subset.</text>
+  <path class="line" d="M307 178 V199"/>
+  <rect class="safe" x="40" y="199" width="535" height="72" rx="8"/>
+  <text class="label" x="62" y="228">2. Read Canvas Only</text>
+  <text class="body" x="62" y="253">Verify identity, expand threads and visit every page.</text>
+  <path class="line" d="M307 271 V292"/>
+  <rect class="box" x="40" y="292" width="535" height="72" rx="8"/>
+  <text class="label" x="62" y="321">3. Capture All Posts and Replies</text>
+  <text class="body" x="62" y="346">Keep exact text, author IDs, parents and source evidence.</text>
+  <path class="line" d="M307 364 V385"/>
+  <rect class="box" x="40" y="385" width="535" height="72" rx="8"/>
+  <text class="label" x="62" y="414">4. Reconcile the Source</text>
+  <text class="body" x="62" y="439">Check roots, every reply, identities and changed entries.</text>
+  <path class="line" d="M307 457 V478"/>
+  <rect class="safe" x="40" y="478" width="535" height="92" rx="8"/>
+  <text class="label" x="62" y="508">5. Export, Verify and Hand Over</text>
+  <text class="body" x="62" y="533">One Excel per cohort. Check saved cells and source.</text>
+  <text class="body" x="62" y="554">Report totals and limitations; no automatic upload.</text>
+  <rect class="safe" x="620" y="106" width="320" height="145" rx="8"/>
+  <text class="label" x="642" y="138">Safety at Every Step</text>
+  <text class="body" x="642" y="168">No course edits, replies or grading.</text>
+  <text class="body" x="642" y="195">No invented or truncated content.</text>
+  <text class="body" x="642" y="222">Viewing may affect read markers.</text>
+  <rect class="warn" x="620" y="276" width="320" height="145" rx="8"/>
+  <text class="label" x="642" y="308">Failed Check? Pause.</text>
+  <text class="body" x="642" y="338">Retry safely or ask for evidence.</text>
+  <text class="body" x="642" y="365">Possible edit: stop and disclose.</text>
+  <text class="body" x="642" y="392">Never label partial work complete.</text>
+  <rect class="box" x="620" y="446" width="320" height="124" rx="8"/>
+  <text class="label" x="642" y="478">Checkpoint Recovery</text>
+  <text class="body" x="642" y="508">The host AI restores verified</text>
+  <text class="body" x="642" y="533">local evidence, never Canvas.</text>
+  <text class="body" x="642" y="554">No silent model-provider switch.</text>
+  <text class="sub" x="40" y="604">Agent-operated workflow with local validation tools, not an unattended crawler.</text>
+</svg>
