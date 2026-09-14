@@ -13,6 +13,8 @@ One-cohort/subset requests are L0 scope choices, not errors. Resolve the user's 
 
 Do not ask for repeated confirmation merely because the workflow is read-only or has multiple stages. Missing data must not be replaced with guesses. Existing user authorization governs routine work; the skill does not grant new browser capabilities.
 
+Missing established extraction capability or direct local transport is L2, not an L1 invitation to improvise a new pipeline. Apply the workflow's capability gate before bulk capture. Do not open TextEdit/Word, relay captured text through the clipboard, manually transcribe submissions, or instruct the user to run a console snippet as an automatic repair. Explain the limitation first and ask once only if a supported alternative needs agreement. A ready-looking expansion toggle with a loading indicator is incomplete capture: wait for loaded content and recheck counts before proceeding.
+
 ## Recovery Record
 
 Apply [Checkpoint Recovery](checkpoint-recovery.md) when a run is interrupted, a host model changes, or an earlier verified local state must be restored. Verify file hashes and source freshness before reuse; never treat a checkpoint label as evidence.

@@ -73,6 +73,8 @@ See the [Canvas read-only policy](skills/discussion/references/canvas-read-only-
 
 ## Workflow Diagram
 
+The everyday flow is **links -> expand and extract -> verify -> cohort Excel files**. Evidence and audit checks stay internal. Preflight verifies the established permitted extraction method and direct local file export before bulk capture. If the host no longer exposes a required capability, the agent explains the limitation before switching methods. It does not silently introduce text-editor or clipboard workarounds. This repository packages the workflow; it does not install or replace the host's browser connector.
+
 The original discussion workflow is retained below. The overview above is the shorter visual guide. The original diagram's editable source is in [docs/workflow-diagram.mmd](docs/workflow-diagram.mmd).
 
 ```mermaid
@@ -110,7 +112,7 @@ Rollback restores a verified **local checkpoint**, never Canvas state. After int
 
 | Stage | What must be verified |
 | --- | --- |
-| Preflight | Current URLs, course/topic identity, selected cohorts, instructions, permitted tools. |
+| Preflight | Current URLs, course/topic identity, selected cohorts, instructions, established extraction capability and direct local export/readback support. |
 | Capture | Expansion, every page, all roots/replies, author IDs, parent relationships, evidence. |
 | Reconciliation | Independent root coverage, known counter semantics, stable versions, no unresolved conflicts. |
 | Export | Selected cohorts only, all reply columns, exact text, audit mappings, fresh output directory. |
