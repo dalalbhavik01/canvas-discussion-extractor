@@ -17,7 +17,7 @@ from verify_workbooks import NS, cell_address
 
 def restore(directory):
     directory = Path(directory)
-    prepared = json.loads((directory / "prepared.json").read_text(encoding="utf-8"))
+    prepared = json.loads((directory / ".audit" / "prepared.json").read_text(encoding="utf-8"))
     for section in prepared["sections"]:
         path = directory / f"{section['key']}.xlsx"
         with zipfile.ZipFile(path) as source:

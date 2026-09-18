@@ -74,10 +74,10 @@ def read_workbook(path):
 
 def verify(directory):
     directory = Path(directory)
-    marker = directory / "VERIFIED.json"
+    marker = directory / ".audit" / "VERIFIED.json"
     if marker.exists():
         marker.unlink()
-    prepared_bytes = (directory / "prepared.json").read_bytes()
+    prepared_bytes = (directory / ".audit" / "prepared.json").read_bytes()
     prepared = json.loads(prepared_bytes)
     if not isinstance(prepared, dict):
         raise ValueError("Expected an object for the prepared manifest")
@@ -97,9 +97,9 @@ def verify(directory):
         raise ValueError("Unexpected workbook files outside selected scope")
     for section in sections:
         sheets = section.get("sheets")
-        if not isinstance(sheets, list) or len(sheets) != 2 or any(not isinstance(s, dict) for s in sheets):
+        if not isinstance(sheets, list) or len(sheets) != 1 or any(not isinstance(s, dict) for s in sheets):
             raise ValueError("Invalid sheet manifest")
-        if [sheet.get("name") for sheet in sheets] != ["Posts and Replies", "Audit"]:
+        if [sheet.get("name") for sheet in sheets] != ["Posts and Replies"]:
             raise ValueError("Invalid sheet manifest order/names")
         for sheet in sheets:
             rows = sheet.get("values")

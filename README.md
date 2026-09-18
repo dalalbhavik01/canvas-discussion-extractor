@@ -1,217 +1,69 @@
 # Canvas Discussion Extractor
 
-A portable agentic workflow for extracting Canvas discussion posts and all replies into cohort-specific Excel workbooks, with Canvas kept read-only.
+An agentic skill for turning Canvas discussions into cohort-specific Excel workbooks. It follows the same one-request workflow as [CoEqual Assignment Creator](https://github.com/dalalbhavik01/coequal-assignment-creator): the agent reads the source, does the checks, and returns the deliverables. Canvas remains read-only.
 
-This project packages a reusable workflow, installable skill, portable prompt, recovery procedures, and verification tools. It follows the operating-playbook structure of [CoEqual Assignment Creator](https://github.com/dalalbhavik01/coequal-assignment-creator), adapted for discussion extraction rather than assignment creation.
+## Use
 
-To use it on another device, install the skill or provide the portable prompt, sign in to Canvas in that device's supported browser, and run `\discussion [Canvas discussion link]`.
+Give the agent one discussion link for one workbook, or two links for two separate workbooks:
 
-## At A Glance
+    \discussion https://canvas.tamu.edu/courses/123/discussion_topics/456
+    \discussion https://canvas.tamu.edu/courses/123/discussion_topics/456 https://canvas.tamu.edu/courses/124/discussion_topics/789
 
-![Canvas discussion extraction overview](docs/workflow-diagram.svg)
+Codex also supports the native skill invocation $discussion. Claude Code uses /discussion. The backslash form is a conversational trigger, not a registered shell command. No cohort flags, manual expansion instructions, or second-link confirmation are needed. The agent never adds another open tab or an old discussion to the request.
 
-The AI agent reads selected discussions, captures posts and replies with source evidence, checks completeness, and prepares one Excel workbook per cohort. Local tools validate captures and compare saved workbook cells. The workflow ends with local files and a verified handoff; it does not grade submissions or upload them to CoEqual.
+The agent needs a browser that can read your already-authenticated Canvas session and save page text locally. A cloned skill does not provide a Canvas login, bypass browser restrictions, or install a browser connector. If that capability is unavailable, it stops and says so; it does not quietly use a text editor or hidden API as a substitute.
 
-## What It Does
+## Result
 
-- Extracts all discussion posts and replies, including replies beyond the second and nested replies.
-- Automatically processes the discussion links supplied: one link for one cohort, two links for both.
-- Keeps cohort files separate and attributes each reply to its writer using verified student IDs.
-- Preserves authored wording, paragraph breaks, links, and verified attachment references.
-- Reconciles root threads and reply counts to detect incomplete captures and virtualized-page gaps.
-- Creates a `Posts and Replies` sheet and a source-mapping `Audit` sheet.
-- Verifies saved cells and reports per-cohort totals and unresolved source issues.
-- Maintains checkpoints and uses the current host AI for bounded, evidence-based recovery.
+Each requested cohort gets its own Excel file. Its first sheet, **Posts and Replies**, has one row per visible author and columns **Student Name**, **Discussion Post**, **Reply 1**, **Reply 2**, then **Reply 3** and beyond as needed. Replies are attributed to their writer, even when nested. Multiple initial posts stay together in the post cell. The skill does not grade, upload to CoEqual, or edit Canvas.
 
-## Primary Trigger
+The agent expands threads, visits all pages, compares Canvas's thread counts with captured replies, spot-checks source text, and reads the saved Excel cells back. If those checks fail, it reports the specific gap instead of presenting a complete-looking file.
 
-For one cohort:
+## Install
 
-```text
-\discussion [Canvas discussion link]
-```
+Clone this repository. It exposes the same skill folder automatically in both hosts:
 
-For both cohorts:
+- Codex, when opened in the clone: .agents/skills/discussion
+- Claude Code, when opened in the clone: .claude/skills/discussion
 
-```text
-\discussion [cohort 1 discussion link] [cohort 2 discussion link]
-```
+Both entries point to skills/discussion, so there is one maintained skill, not two drifting copies. To use it from another project, copy or symlink that complete folder into your personal Codex skills directory (usually ~/.codex/skills/discussion) or Claude Code skills directory (usually ~/.claude/skills/discussion).
 
-The links are the scope. No extra flags, cohort commands, or "only cohort 1" instruction is required. Supply one link to process that discussion only; supply two to process both separately. Other open tabs and previously used links are not added automatically.
+Node 20+ runs the snapshot parser and normalizer. The Excel builder uses Codex's bundled spreadsheet runtime when available. On another host it automatically uses Python/openpyxl; install requirements.txt in a project virtual environment once, then run the agent from that environment. No packages or student data are stored in the Git repository.
 
-The agent verifies each discussion's identity from Canvas. If one of two links is inaccessible, it finishes independent work on the other and reports the blocked link; it does not silently treat the request as a successful one-link run.
+## Workflow
 
-For Codex accounts with the skill installed:
+The original flow diagram is retained:
 
-```text
-$discussion [Canvas discussion link]
-```
+![Original workflow diagram](docs/workflow-diagram.svg)
 
-For Claude or another browser-capable agent, supply the [portable workflow prompt](skills/discussion/references/portable-workflow.md), then ask:
+The day-to-day flow is simpler:
 
-```text
-Run the discussion extraction workflow for these Canvas links: [discussion links]
-Keep Canvas read-only. Capture all posts and replies, keep cohorts separate,
-and verify the Excel files before handing them over.
-```
+~~~mermaid
+flowchart LR
+    A[One or two Canvas links] --> B[Read-only capture of all pages]
+    B --> C[Posts and every reply]
+    C --> D{Counts and text checked?}
+    D -->|Yes| E[One Excel per cohort]
+    E --> F[Saved-cell readback]
+    F --> G[Deliver workbooks]
+    D -->|No| H[Recheck source or report gap]
+    H --> B
+~~~
 
-`\discussion` is the conversational trigger, not a custom command registered with the app. The host needs permitted browser and file tools; this repository does not provide a Canvas login or run an unattended browser service.
+## Local tools
 
-## Safety Promise
+The agent creates a private manifest and page snapshots, then runs the included tools. These are internal steps, not extra instructions for the user:
 
-Canvas is treated as read-only. The workflow must not:
+    node skills/discussion/scripts/parse_snapshots.mjs manifest.json capture.json
+    node skills/discussion/scripts/build_workbooks.mjs capture.json fresh-output-folder
+    python3 skills/discussion/scripts/verify_workbooks.py fresh-output-folder
 
-- Edit, save, publish, unpublish, delete, or manage course content.
-- Reply, post, grade, or change feedback, settings, groups, or submissions.
-- Call Canvas APIs, bypass authentication, or use inspection capabilities prohibited by the host.
-- Invent missing content, silently truncate replies, or merge students by name alone.
-- Upload student data to CoEqual or another service as part of this extraction-only workflow.
+Only the Excel files appear as normal files in the output folder; a hidden .audit folder holds readback evidence. See [capture details](skills/discussion/references/capture.md) for the input shape and fallback behavior.
 
-Before every browser action, the agent checks its target and read-only scope. If an action may have changed Canvas, it stops browser interaction and reports what is known and uncertain without attempting an undo. Viewing discussions may change read/unread indicators; these are reported separately from course-content edits.
+## Status and limits
 
-See the [Canvas read-only policy](skills/discussion/references/canvas-read-only-policy.md) for the full action rules.
+The simplified parser and both Excel exporters were tested against saved, six-page Canvas discussion snapshots for two sections. It recovered two depth-4 replies that an older two-level parser missed, and all exported cells passed independent readback. The parser recognizes the Canvas accessibility format in those snapshots; if Canvas changes that format or presents content it cannot interpret, it must be checked against the live source before delivery. This repository has not been proven end-to-end on every browser or Claude Code installation.
 
-## Workflow Diagram
+Opening discussions may change read/unread state, even though the skill does not edit course content. The unread badge is not a submission total. Keep captures, workbooks, credentials, cookies, and student data out of Git.
 
-The everyday flow is **links -> expand and extract -> verify -> cohort Excel files**. Evidence and audit checks stay internal. Preflight verifies the established permitted extraction method and direct local file export before bulk capture. If the host no longer exposes a required capability, the agent explains the limitation before switching methods. It does not silently introduce text-editor or clipboard workarounds. This repository packages the workflow; it does not install or replace the host's browser connector.
-
-The original discussion workflow is retained below. The overview above is the shorter visual guide. The original diagram's editable source is in [docs/workflow-diagram.mmd](docs/workflow-diagram.mmd).
-
-```mermaid
-flowchart TD
-    A[User sends discussion links] --> B[Preflight and run checkpoint]
-    B --> C{Canvas action is read-only?}
-    C -->|Yes| D[Expand and capture every page and reply]
-    C -->|No or uncertain| X[Stop the action and report]
-    D --> E[Reconcile roots, replies, and student IDs]
-    E --> F{Source coverage verified?}
-    F -->|No| R[Classify issue and use a safe recovery]
-    R --> D
-    F -->|Yes| G[Create one Excel file per cohort]
-    G --> H[Read saved cells and compare with capture]
-    H --> I[Source spot-checks and visual review]
-    I --> J[Deliver files and verification summary]
-```
-
-The read-only action gate applies to every browser action, including recovery attempts. Failed verification blocks complete handoff; repair the affected stage or report the unresolved issue.
-
-## Decision Levels
-
-| Level | Meaning | Action |
-| --- | --- | --- |
-| L0 | Normal, verified path | Continue and checkpoint. A one-cohort request is normal scope. |
-| L1 | Safe fallback preserving source truth | Retry within limits or repair local output, then verify the result. |
-| L2 | Missing source, access, or decision | Pause affected work and ask. Independent authorized cohorts may continue. |
-| L3 | Unsafe action or suspected mutation | Stop the action; suspected Canvas mutation stops all browser interaction. |
-
-See [error handling](skills/discussion/references/error-handling.md), the [failure matrix](skills/discussion/references/comprehensive-error-handling-matrix.md), and [host-model escalation](skills/discussion/references/model-escalation.md).
-
-Rollback restores a verified **local checkpoint**, never Canvas state. After interruption or a model change, verify checkpoint files, current instructions, scope, and source freshness before resuming. The workflow does not automatically switch providers or assume another model's memory transferred. See [checkpoint recovery](skills/discussion/references/checkpoint-recovery.md).
-
-## Stage Verification
-
-| Stage | What must be verified |
-| --- | --- |
-| Preflight | Current URLs, course/topic identity, selected cohorts, instructions, established extraction capability and direct local export/readback support. |
-| Capture | Expansion, every page, all roots/replies, author IDs, parent relationships, evidence. |
-| Reconciliation | Independent root coverage, known counter semantics, stable versions, no unresolved conflicts. |
-| Export | Selected cohorts only, all reply columns, exact text, audit mappings, fresh output directory. |
-| Readback | Valid manifest, expected workbooks/sheets, matching saved cells, no formulas or extra content. |
-| Final review | Legible layout, source spot-checks, freshness, totals, exclusions and limitations. |
-
-Use the [verification checklist](skills/discussion/references/verification-checklist.md) at checkpoints and handoff. Source completeness and saved-cell preservation are separate checks; passing one does not establish the other.
-
-## Workbook Format
-
-Each requested cohort receives a separate `.xlsx` file. The first sheet is `Posts and Replies`:
-
-| Student Name | Discussion Post | Reply 1 | Reply 2 | Reply 3... |
-| --- | --- | --- | --- | --- |
-| One row per student | All top-level posts by that student | First peer reply | Second peer reply | Every additional peer reply |
-
-Replies belong to their writer, not the thread owner. Self-follow-ups, replies to staff, and staff content remain in the `Audit` sheet and local capture, separately from peer reply columns. Quotes and attachments retain their documented treatment. Blank cells do not establish missing work or grades.
-
-Gradebook order requires a current verified ordered roster; otherwise the agent reports captured author order. CoEqual support for extra reply columns must be checked before an actual import. This workflow does not perform that import.
-
-## Repository Structure
-
-```text
-.
-|-- README.md
-|-- config.example.json
-|-- docs/
-|   |-- README.md
-|   |-- workflow-diagram.svg
-|   |-- workflow-diagram.mmd
-|   |-- agentic-architecture.md
-|   |-- development.md
-|   |-- reliability-audit.md
-|   `-- old-repo-comparison.md
-|-- skills/
-|   `-- discussion/
-|       |-- SKILL.md
-|       |-- agents/openai.yaml
-|       |-- references/
-|       |   |-- workflow.md
-|       |   |-- portable-workflow.md
-|       |   |-- transfer.md
-|       |   |-- canvas-read-only-policy.md
-|       |   |-- error-handling.md
-|       |   |-- comprehensive-error-handling-matrix.md
-|       |   |-- model-escalation.md
-|       |   |-- checkpoint-recovery.md
-|       |   |-- run-state-template.json
-|       |   |-- verification-checklist.md
-|       |   |-- failure-drills.md
-|       |   `-- data-contract.md
-|       `-- scripts/
-|           |-- prepare.mjs
-|           |-- build_workbooks.mjs
-|           |-- restore_text_cells.py
-|           `-- verify_workbooks.py
-`-- tests/
-```
-
-The [documentation index](docs/README.md) links every guide by purpose. Operational instructions live inside the skill so copying it transfers the complete workflow without duplicated policy files drifting apart.
-
-## Quick Start
-
-1. Install the complete `skills/discussion` folder in your host's skills location, or supply the portable prompt.
-2. Sign in to Canvas manually in a browser the host can operate.
-3. Provide one current discussion link or both links. No extra cohort-selection instruction is needed.
-4. Run `\discussion [Canvas discussion link]`.
-5. Let the agent capture, reconcile, export and verify using the workflow's gates.
-6. Review the returned file links, cohort totals and limitations before using the workbooks in CoEqual.
-
-No Canvas API token or OAuth integration is required. The host also needs file/spreadsheet tools, as described in the transfer guide.
-
-## Setup On Another Device
-
-For a Codex account, ask its skill installer:
-
-```text
-Install the discussion skill from
-https://github.com/dalalbhavik01/canvas-discussion-extractor/tree/main/skills/discussion
-```
-
-Alternatively, clone the repository and install the complete `skills/discussion` folder. Keep its entrypoint, references, metadata and scripts together. Check for customizations before replacing an existing installation. No ZIP is required.
-
-For another agent, provide the [portable prompt](skills/discussion/references/portable-workflow.md) and ensure it can use its own permitted browser and spreadsheet tools. Follow the [transfer guide](skills/discussion/references/transfer.md) for runtime requirements and export commands.
-
-Optional defaults are in [config.example.json](config.example.json). The agent interprets them; scripts accept explicit input/output paths and cohort keys. Keep private configuration and outputs outside version control. Install new dependencies only in isolated project environments, not globally.
-
-## Portability
-
-The workflow depends on verified evidence, not a particular course, account, model or browser. The host may use the included exporter when the required runtime is available, or another supported exporter followed by independent readback.
-
-Do not transfer login cookies, credentials, student records, grades or machine-specific paths with the skill. Installing it does not transfer a Canvas session. See [architecture](docs/agentic-architecture.md) for the division between agent responsibilities and local tools.
-
-## Testing and Limitations
-
-The latest reliability audit passed **57 synthetic tests** covering capture validation, automatic one/two-cohort processing, workbook exports and verifier failures. Live Canvas extraction, real model handoffs and CoEqual import acceptance still require supervised verification. The safeguards do not guarantee coverage of every future UI failure.
-
-See [development and test commands](docs/development.md), [failure drills](skills/discussion/references/failure-drills.md), and the [reliability audit](docs/reliability-audit.md) for reproducible checks and remaining limits.
-
-## Core Principle
-
-Continue autonomously when evidence supports a safe action. When scope, identity, completeness or Canvas integrity cannot be established, preserve the evidence and report the precise issue. Never replace missing evidence with a successful-looking workbook.
+Run the synthetic tests with Node's test runner and Python unittest. The tests never contact Canvas.

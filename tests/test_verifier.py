@@ -23,7 +23,7 @@ class VerificationTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.folder = Path(self.temp.name) / "export"
         shutil.copytree(os.environ["DISCUSSION_TEST_EXPORT"], self.folder)
-        prepared = json.loads((self.folder / "prepared.json").read_text())
+        prepared = json.loads((self.folder / ".audit" / "prepared.json").read_text())
         self.workbook = self.folder / f"{prepared['sections'][0]['key']}.xlsx"
 
     def change_xml(self, member, change):
@@ -48,7 +48,7 @@ class VerificationTests(unittest.TestCase):
         self.change_xml("xl/worksheets/sheet1.xml", change)
         with self.assertRaisesRegex(ValueError, "source cell mismatch"):
             verifier.verify(self.folder)
-        self.assertFalse((self.folder / "VERIFIED.json").exists())
+        self.assertFalse((self.folder / ".audit" / "VERIFIED.json").exists())
 
     def test_formula_injection_rejected(self):
         def change(root):
@@ -74,7 +74,7 @@ class VerificationTests(unittest.TestCase):
             verifier.verify(self.folder)
 
     def change_prepared(self, change):
-        file = self.folder / "prepared.json"
+        file = self.folder / ".audit" / "prepared.json"
         data = json.loads(file.read_text())
         change(data)
         file.write_text(json.dumps(data))
@@ -83,10 +83,10 @@ class VerificationTests(unittest.TestCase):
         self.change_prepared(lambda data: data.update(sections=[]))
         with self.assertRaisesRegex(ValueError, "nonempty section"):
             verifier.verify(self.folder)
-        self.assertFalse((self.folder / "VERIFIED.json").exists())
+        self.assertFalse((self.folder / ".audit" / "VERIFIED.json").exists())
 
     def test_nonobject_manifest_rejected(self):
-        (self.folder / "prepared.json").write_text("null")
+        (self.folder / ".audit" / "prepared.json").write_text("null")
         with self.assertRaisesRegex(ValueError, "Expected an object"):
             verifier.verify(self.folder)
 
