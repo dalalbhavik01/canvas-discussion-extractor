@@ -43,7 +43,7 @@ export async function build(inputPath, outputDir, { selectedKeys } = {}) {
     range.format.verticalAlignment = 'top';
     range.format.columnWidth = 65;
     sheet.getRangeByIndexes(0, 0, height, 1).format.columnWidth = 27;
-    if (height > 1) sheet.getRangeByIndexes(1, 0, height - 1, width).format.rowHeight = 100;
+    if (height > 1) sheet.getRangeByIndexes(1, 0, height - 1, width).format.autofitRows();
     const header = sheet.getRangeByIndexes(0, 0, 1, width);
     header.format.fill = '#4A1730';
     header.format.font = { name: 'Arial', size: 10, bold: true, color: '#FFFFFF' };

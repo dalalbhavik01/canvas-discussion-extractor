@@ -109,3 +109,48 @@ test('snapshot parser includes depth-four replies and preserves display order', 
   assert.equal(capture.sections[0].entries[2].parent_id, 'p1e2');
   assert.equal(prepareCapture(capture).sections[0].summary.replies, 2);
 });
+
+test('current Canvas AX snapshots parse and reconcile omitted author IDs', async t => {
+  const folder = await fs.mkdtemp(path.join(os.tmpdir(), 'discussion-skill-current-'));
+  t.after(() => fs.rm(folder, { recursive: true, force: true }));
+  const url = 'https://canvas.tamu.edu/courses/1/discussion_topics/2';
+  const snapshot = [
+    `Browser tab: 1, Title: "Sample", URL: "${url}".`,
+    '78 button (expanded) Collapse Threads, Secondary Actions: Collapse',
+    '    149 container Reply to Post by Student A from 2026-09-01',
+    '      150 link Description: Student A, Value: canvas.tamu.edu/courses/1/users/1',
+    '      151 container',
+    '        152 heading Reply from Student A, Value: 2',
+    '          153 text Reply from Student A',
+    '        154 container',
+    '          155 text First post inside a Canvas wrapper.',
+    '        156 content list',
+    '          157 button (expanded) Collapse discussion thread from Student A Hide 1 Reply, Secondary Actions: Collapse',
+    '          158 button Reply to post from Student A',
+    '    159 container Reply to Post by Student A from 2026-09-01',
+    '      160 link Description: Student A, Value: …',
+    '      161 container',
+    '        162 heading Reply from Student A, Value: 3',
+    '          163 text Reply from Student A',
+    '        164 text A reply whose link target is omitted in the AX snapshot.',
+    '        165 content list',
+    '          166 button Reply to post from Student A',
+  ].join('\n');
+  await fs.writeFile(path.join(folder, 'page_1.txt'), snapshot);
+  const capture = await parseManifest({ sections: [{
+    key: '701', url, dir: folder, title: 'Sample',
+  }] }, folder);
+  assert.deepEqual(capture.sections[0].issues, []);
+  assert.deepEqual(capture.sections[0].entries.map(entry => entry.text), [
+    'First post inside a Canvas wrapper.',
+    'A reply whose link target is omitted in the AX snapshot.',
+  ]);
+  const prepared = prepareCapture(capture).sections[0];
+  assert.equal(prepared.summary.students, 1);
+  assert.deepEqual(prepared.sheets[0].values[1], [
+    'Student A',
+    'First post inside a Canvas wrapper.',
+    'A reply whose link target is omitted in the AX snapshot.',
+    '',
+  ]);
+});

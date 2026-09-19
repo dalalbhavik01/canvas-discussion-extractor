@@ -73,11 +73,50 @@ function bodyFrom(block, headingIndex, issues, location) {
   return paragraphs.join('\n\n');
 }
 
+function modernIndent(line) {
+  return (line.match(/^\s*/) ?? [''])[0].length;
+}
+
+function modernText(line) {
+  const match = line.match(/^\s*\d+\s+text(?:\s+(.*))?$/);
+  return match?.[1] ? readValue(match[1]) : '';
+}
+
+function bodyFromModern(block, headingIndex, issues, location) {
+  const headingIndent = modernIndent(block[headingIndex]);
+  const actionIndex = block.findIndex((line, index) => index > headingIndex
+    && /\d+\s+button (?:Reply to post from|\(expanded\) Collapse discussion thread|\(collapsed\) Expand discussion thread)/.test(line));
+  if (actionIndex < 0) {
+    issues.push(location + ': reply/action controls were not found');
+    return '';
+  }
+
+  let end = actionIndex;
+  while (end > headingIndex && !(modernIndent(block[end]) === headingIndent
+    && /\d+\s+content list$/.test(block[end]))) end--;
+  if (end === headingIndex) {
+    issues.push(location + ': action-list boundary was not found');
+    return '';
+  }
+
+  const paragraphs = [];
+  for (const line of block.slice(headingIndex + 1, end)) {
+    if (modernIndent(line) < headingIndent) continue;
+    const text = modernText(line);
+    if (text && !text.startsWith('Reply from ')) paragraphs.push(text);
+  }
+  if (!paragraphs.length) issues.push(location + ': no readable body text');
+  return paragraphs.join('\n\n');
+}
+
 function parsePage(text, section, page, sourceFile, issues, startOrder) {
   const lines = text.split(/\r?\n/);
   const starts = [];
+  const modern = lines.some(line => /\d+\s+container Reply to Post by /.test(line));
   for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(/^    - generic "Reply to Post by (.+) from (\d{4}-\d{2}-\d{2})":$/);
+    const match = modern
+      ? lines[i].match(/^\s*\d+\s+container Reply to Post by (.+) from (\d{4}-\d{2}-\d{2})$/)
+      : lines[i].match(/^    - generic "Reply to Post by (.+) from (\d{4}-\d{2}-\d{2})":$/);
     if (match) starts.push({ index: i, author: match[1] });
   }
   if (!starts.length) issues.push(section.key + '/page ' + page + ': no entries found');
@@ -86,13 +125,17 @@ function parsePage(text, section, page, sourceFile, issues, startOrder) {
   for (let n = 0; n < starts.length; n++) {
     const current = starts[n];
     const block = lines.slice(current.index, starts[n + 1]?.index ?? lines.length);
-    const headingIndex = block.findIndex(line => /- heading "Reply from .*" \[level=\d+\]:/.test(line));
+    const headingIndex = block.findIndex(line => modern
+      ? /\d+\s+heading Reply from .+, Value: \d+$/.test(line)
+      : /- heading "Reply from .*" \[level=\d+\]:/.test(line));
     const location = section.key + '/page ' + page + '/entry ' + (n + 1);
     if (headingIndex < 0) {
       issues.push(location + ': missing reply heading (possibly deleted)');
       continue;
     }
-    const level = Number(block[headingIndex].match(/\[level=(\d+)\]/)[1]);
+    const level = Number(modern
+      ? block[headingIndex].match(/Value: (\d+)$/)[1]
+      : block[headingIndex].match(/\[level=(\d+)\]/)[1]);
     if (level < 2) {
       issues.push(location + ': unexpected heading level ' + level);
       continue;
@@ -110,7 +153,9 @@ function parsePage(text, section, page, sourceFile, issues, startOrder) {
       author_id: authorLink?.[1] ?? null,
       parent_id: parent?.id ?? null, level, page, order: startOrder + entries.length + 1,
       source_file: sourceFile,
-      text: bodyFrom(block, headingIndex, issues, location),
+      text: modern
+        ? bodyFromModern(block, headingIndex, issues, location)
+        : bodyFrom(block, headingIndex, issues, location),
       expected_replies: count ? Number(count[1].replaceAll(',', '')) : (level === 2 ? 0 : null),
     };
     entries.push(entry);
@@ -138,10 +183,13 @@ export async function parseManifest(manifest, base) {
       const page = Number(file.match(/\d+/)[0]);
       const fullPath = path.join(folder, file);
       const snapshot = await fs.readFile(fullPath, 'utf8');
-      const expanded = /button "Collapse Threads" \[expanded\]/.test(snapshot);
+      const expanded = /button "Collapse Threads" \[expanded\]/.test(snapshot)
+        || /button \(expanded\) Collapse Threads/.test(snapshot);
       if (!expanded) issues.push(section.key + '/page ' + page + ': threads not confirmed expanded');
       if (!snapshot.includes('/url: ' + expectedPath)
-        && !snapshot.includes('/url: ' + topic.origin + expectedPath)) {
+        && !snapshot.includes('/url: ' + topic.origin + expectedPath)
+        && !snapshot.includes('URL: "' + section.url + '"')
+        && !snapshot.includes('URL: ' + topic.host + expectedPath)) {
         issues.push(section.key + '/page ' + page + ': topic URL not confirmed in snapshot');
       }
       const sourceFile = path.relative(base, fullPath);

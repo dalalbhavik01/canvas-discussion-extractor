@@ -67,6 +67,21 @@ function prepareSection(section) {
   const ids = new Set();
   const authors = new Map();
   const entries = section.entries;
+  const knownIdsByName = new Map();
+  for (const entry of entries) {
+    if (!entry.author_id) continue;
+    if (!knownIdsByName.has(entry.author)) knownIdsByName.set(entry.author, new Set());
+    knownIdsByName.get(entry.author).add(entry.author_id);
+  }
+  for (const [name, authorIds] of knownIdsByName) {
+    check(authorIds.size === 1,
+      key + ': same display name has multiple Canvas user IDs; resolve before export: ' + name);
+  }
+  const authorKeyFor = entry => {
+    if (entry.author_id) return 'id:' + entry.author_id;
+    const knownIds = knownIdsByName.get(entry.author);
+    return knownIds?.size === 1 ? 'id:' + [...knownIds][0] : 'name:' + entry.author;
+  };
   for (const [index, entry] of entries.entries()) {
     check(entry && typeof entry.id === 'string' && !ids.has(entry.id), key + ': duplicate/missing local entry ID');
     ids.add(entry.id);
@@ -78,7 +93,7 @@ function prepareSection(section) {
       key + ': missing source file');
     validText(entry.text, key + '/' + entry.id);
     check(entry.text.trim(), key + ': empty body for ' + entry.id);
-    const authorKey = entry.author_id ? 'id:' + entry.author_id : 'name:' + entry.author;
+    const authorKey = authorKeyFor(entry);
     const found = authors.get(authorKey);
     check(!found || found === entry.author, key + ': one author ID has conflicting names');
     authors.set(authorKey, entry.author);
@@ -109,7 +124,7 @@ function prepareSection(section) {
   }
   const names = new Map();
   for (const entry of entries) {
-    const authorKey = entry.author_id ? 'id:' + entry.author_id : 'name:' + entry.author;
+    const authorKey = authorKeyFor(entry);
     const previous = names.get(entry.author);
     check(!previous || previous === authorKey,
       key + ': same display name has multiple identities; resolve before export: ' + entry.author);
@@ -118,7 +133,7 @@ function prepareSection(section) {
 
   const grouped = new Map();
   for (const entry of entries) {
-    const authorKey = entry.author_id ? 'id:' + entry.author_id : 'name:' + entry.author;
+    const authorKey = authorKeyFor(entry);
     if (!grouped.has(authorKey)) grouped.set(authorKey, { name: entry.author, posts: [], replies: [] });
     grouped.get(authorKey)[entry.kind === 'post' ? 'posts' : 'replies'].push(entry.text);
   }
